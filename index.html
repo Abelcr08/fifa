@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torneo FIFA 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #1a4a2e;
+  --green-mid: #2d7a4f;
+  --green-light: #e8f5ee;
+  --gold: #f0a500;
+  --gold-light: #fff8e7;
+  --red: #c0392b;
+  --bg: #0d0d0d;
+  --bg2: #141414;
+  --bg3: #1c1c1c;
+  --border: rgba(255,255,255,0.08);
+  --text: #f0f0f0;
+  --text2: #999;
+  --ps5: #003087;
+  --ps5b: #0070cc;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ---- NAV ---- */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: var(--bg2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--gold); }
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab { padding: 7px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; color: var(--text2); transition: all 0.2s; }
+.nav-tab:hover { color: var(--text); background: var(--bg3); }
+.nav-tab.active { background: var(--green); color: #fff; border-color: var(--green-mid); }
+.nav-status { font-size: 12px; color: var(--text2); }
+.live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; margin-right: 5px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ---- VIEWS ---- */
+.view { display: none; padding: 24px; }
+.view.active { display: block; }
+
+/* ---- ADMIN SETUP ---- */
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 16px; }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+.card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+.field-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.field-row label { font-size: 13px; color: var(--text2); min-width: 110px; }
+input[type=text], input[type=number], select {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); padding: 8px 12px; font-size: 13px; font-family: inherit; outline: none;
+  transition: border-color 0.2s;
+}
+input[type=text]:focus, input[type=number]:focus, select:focus { border-color: var(--green-mid); }
+.players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.player-inp { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 7px; padding: 7px 10px; }
+.player-num { width: 22px; height: 22px; border-radius: 50%; background: var(--green); font-size: 11px; font-weight: 600; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.player-inp input { background: transparent; border: none; color: var(--text); font-size: 13px; width: 100%; padding: 0; }
+.player-inp input:focus { outline: none; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { padding: 9px 18px; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text); font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: #222; border-color: rgba(255,255,255,0.2); }
+.btn.green { background: var(--green); border-color: var(--green-mid); color: #fff; }
+.btn.green:hover { background: var(--green-mid); }
+.btn.gold { background: var(--gold); border-color: #c88a00; color: #000; font-weight: 600; }
+.btn.gold:hover { background: #e09800; }
+.btn.danger { background: rgba(192,57,43,0.15); border-color: rgba(192,57,43,0.4); color: #e74c3c; }
+.btn.danger:hover { background: rgba(192,57,43,0.3); }
+.btn.sm { padding: 5px 12px; font-size: 12px; }
+
+/* ---- MATCH MANAGER ---- */
+.match-queue { display: flex; flex-direction: column; gap: 10px; }
+.match-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.match-card.playing { border-color: var(--gold); background: rgba(240,165,0,0.06); }
+.match-card.done { opacity: 0.55; }
+.match-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.round-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; background: var(--bg2); color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+.console-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; background: var(--ps5); color: #fff; }
+.match-players { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mp { flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; text-align: center; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; position: relative; }
+.mp:hover { border-color: rgba(255,255,255,0.3); }
+.mp.winner { background: rgba(26,74,46,0.4); border-color: var(--green-mid); color: #4cde8c; }
+.mp.loser { opacity: 0.4; text-decoration: line-through; }
+.mp.tbd { color: var(--text2); font-style: italic; font-size: 13px; }
+.vs-label { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--text2); letter-spacing: 1px; }
+.match-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.score-inputs { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.score-inputs input { width: 48px; text-align: center; }
+.score-sep { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--text2); }
+.tbd-notice { font-size: 12px; color: var(--text2); font-style: italic; text-align: center; padding: 8px 0; }
+
+/* ---- BRACKET VIEW ---- */
+.bracket-container { overflow-x: auto; padding-bottom: 20px; }
+.bracket-flex { display: flex; gap: 0; min-width: fit-content; }
+.b-round { min-width: 170px; flex: 1; }
+.b-round-label { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1.5px; color: var(--gold); text-align: center; padding: 10px 8px 8px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.b-col { display: flex; flex-direction: column; justify-content: space-around; padding: 0 6px; }
+.b-match { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 8px 0; }
+.b-match.active-match { border-color: var(--gold); box-shadow: 0 0 12px rgba(240,165,0,0.2); }
+.b-player { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.b-player:last-child { border-bottom: none; }
+.b-player.winner { background: rgba(26,74,46,0.35); color: #4cde8c; font-weight: 600; }
+.b-player.loser { opacity: 0.35; text-decoration: line-through; }
+.b-player.tbd { color: var(--text2); font-style: italic; font-size: 12px; }
+.b-score { margin-left: auto; font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--gold); }
+.b-console { font-size: 10px; padding: 2px 6px; background: var(--ps5); color: #fff; border-radius: 3px; font-weight: 600; }
+
+/* ---- TV DISPLAY ---- */
+#view-display { background: #000; min-height: 100vh; padding: 0; }
+.tv-header { background: linear-gradient(135deg, #0a2016 0%, #1a4a2e 50%, #0a2016 100%); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--gold); }
+.tv-logo { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 4px; color: var(--gold); text-shadow: 0 0 30px rgba(240,165,0,0.4); }
+.tv-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 2px; text-transform: uppercase; }
+.tv-body { padding: 24px 32px; display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+.tv-section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.tv-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(240,165,0,0.3); }
+
+/* TV Consoles */
+.tv-consoles { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.tv-console-card { background: rgba(0,48,135,0.25); border: 1px solid rgba(0,112,204,0.4); border-radius: 10px; padding: 14px 16px; }
+.tv-console-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: #5b9ef4; margin-bottom: 10px; }
+.tv-console-match { display: flex; align-items: center; justify-content: space-between; }
+.tv-player { text-align: center; flex: 1; }
+.tv-player-name { font-size: 16px; font-weight: 600; color: #fff; }
+.tv-player-score { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--gold); }
+.tv-vs { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: rgba(255,255,255,0.3); padding: 0 12px; }
+.tv-console-empty { font-size: 13px; color: rgba(255,255,255,0.3); font-style: italic; text-align: center; padding: 8px 0; }
+.tv-round-tag { font-size: 11px; padding: 3px 8px; background: rgba(240,165,0,0.15); border: 1px solid rgba(240,165,0,0.3); color: var(--gold); border-radius: 4px; text-align: center; margin-top: 8px; font-weight: 600; letter-spacing: 0.05em; }
+
+/* TV Next Up */
+.tv-queue { display: flex; flex-direction: column; gap: 8px; }
+.tv-queue-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+.tv-queue-num { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.08); font-size: 11px; color: var(--text2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tv-queue-names { font-size: 14px; color: var(--text); }
+.tv-queue-round { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* TV Bracket mini */
+.tv-bracket-mini { overflow-x: auto; }
+.tv-bm-round { margin-bottom: 8px; }
+.tv-bm-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.tv-bm-matches { display: flex; gap: 6px; flex-wrap: wrap; }
+.tv-bm-match { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 11px; min-width: 130px; }
+.tv-bm-match.active { border-color: var(--gold); }
+.tv-bm-p { padding: 2px 0; color: var(--text2); }
+.tv-bm-p.w { color: #4cde8c; font-weight: 600; }
+.tv-bm-p.l { opacity: 0.35; text-decoration: line-through; }
+
+/* Champion screen */
+.tv-champion { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; }
+.tv-trophy { font-size: 80px; margin-bottom: 16px; animation: bounce 1.5s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.tv-champion-label { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+.tv-champion-name { font-family: 'Bebas Neue', sans-serif; font-size: 72px; letter-spacing: 6px; color: var(--gold); text-shadow: 0 0 40px rgba(240,165,0,0.5); }
+
+/* Responsive */
+@media (max-width: 900px) { .tv-body { grid-template-columns: 1fr; } }
+
+/* Stats */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+.stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); }
+.stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">⚽ TORNEO FIFA 2026</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showView('setup')" id="ntab-setup">⚙ Configuración</div>
+    <div class="nav-tab" onclick="showView('manage')" id="ntab-manage">🎮 Resultados</div>
+    <div class="nav-tab" onclick="showView('bracket')" id="ntab-bracket">🏆 Bracket</div>
+    <div class="nav-tab" onclick="showView('display')" id="ntab-display">📺 Pantalla TV</div>
+  </div>
+  <div class="nav-status"><span class="live-dot"></span>En vivo</div>
+</nav>
+
+<!-- ===== SETUP ===== -->
+<div class="view active" id="view-setup">
+  <div class="section-title">Configuración del Torneo</div>
+
+  <div class="card">
+    <div class="card-title">Parámetros</div>
+    <div class="field-row">
+      <label>Nombre del torneo</label>
+      <input type="text" id="cfg-name" value="Torneo FIFA 2026" style="width:220px">
+    </div>
+    <div class="field-row">
+      <label>Número de jugadores</label>
+      <select id="cfg-players" onchange="buildPlayerInputs()">
+        <option value="4">4 jugadores</option>
+        <option value="8" selected>8 jugadores</option>
+        <option value="16">16 jugadores</option>
+        <option value="32">32 jugadores</option>
+        <option value="custom">Personalizado...</option>
+      </select>
+      <input type="number" id="cfg-custom" min="2" max="64" value="8" style="width:70px;display:none" onchange="buildPlayerInputs()">
+    </div>
+    <div class="field-row">
+      <label>Consolas</label>
+      <select id="cfg-consoles">
+        <option value="1">1 PS5</option>
+        <option value="2" selected>2 PS5</option>
+        <option value="3">3 consolas</option>
+        <option value="4">4 consolas</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Jugadores</div>
+    <div class="players-grid" id="players-grid"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="shufflePlayers()">🔀 Aleatorio</button>
+      <button class="btn" onclick="clearPlayers()">🗑 Limpiar</button>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn gold" onclick="startTournament()">🚀 Iniciar Torneo</button>
+  </div>
+</div>
+
+<!-- ===== MANAGE ===== -->
+<div class="view" id="view-manage">
+  <div class="section-title">Gestión de Partidos</div>
+  <div class="stats-grid" id="stats-grid"></div>
+  <div id="manage-body"></div>
+</div>
+
+<!-- ===== BRACKET ===== -->
+<div class="view" id="view-bracket">
+  <div class="section-title">Bracket del Torneo</div>
+  <div class="bracket-container" id="bracket-container"></div>
+</div>
+
+<!-- ===== DISPLAY ===== -->
+<div class="view" id="view-display">
+  <div class="tv-header">
+    <div>
+      <div class="tv-logo" id="tv-title">⚽ TORNEO FIFA 2026</div>
+      <div class="tv-subtitle">Parque Tempisque · En vivo</div>
+    </div>
+    <div id="tv-clock" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:rgba(255,255,255,0.5);letter-spacing:2px;"></div>
+  </div>
+  <div id="tv-body"></div>
+</div>
+
+<script>
+// ==================== STATE ====================
+let state = {
+  name: 'Torneo FIFA 2026',
+  players: [],
+  consoles: 2,
+  rounds: [],      // array of rounds, each round = array of matches
+  started: false
+};
+
+// match: { id, round, index, p1, p2, score1, score2, winner, console: null|1|2..., status: 'pending'|'playing'|'done' }
+
+// ==================== SETUP ====================
+document.getElementById('cfg-players').addEventListener('change', function() {
+  document.getElementById('cfg-custom').style.display = this.value === 'custom' ? '' : 'none';
+  buildPlayerInputs();
+});
+
+function getPlayerCount() {
+  const sel = document.getElementById('cfg-players');
+  if(sel.value === 'custom') return parseInt(document.getElementById('cfg-custom').value) || 8;
+  return parseInt(sel.value);
+}
+
+function buildPlayerInputs() {
+  const n = getPlayerCount();
+  const g = document.getElementById('players-grid');
+  g.innerHTML = '';
+  for(let i=0;i<n;i++) {
+    const d = document.createElement('div');
+    d.className = 'player-inp';
+    d.innerHTML = `<div class="player-num">${i+1}</div><input type="text" placeholder="Jugador ${i+1}" id="pin-${i}" value="${state.players[i]||''}">`;
+    g.appendChild(d);
+  }
+}
+
+function shufflePlayers() {
+  const names = ['Abel','Mauricio','Álvaro','Emerson','Andy','Adrián','Carlos','Luis','Andrés','Diego','Javier','Rodrigo','Sebastián','Pablo','Felipe','Marcos','Tamara','Marianela','Ana','Beatriz','Fernando','Hugo','Ignacio','José','Kevin','Laura','Miguel','Natalia','Oscar','Patricia'];
+  const n = getPlayerCount();
+  state.players = names.slice(0, n);
+  buildPlayerInputs();
+}
+
+function clearPlayers() {
+  state.players = [];
+  buildPlayerInputs();
+}
+
+function startTournament() {
+  const n = getPlayerCount();
+  const players = [];
+  for(let i=0;i<n;i++) {
+    const v = (document.getElementById(`pin-${i}`)?.value||'').trim();
+    players.push(v || `Jugador ${i+1}`);
+  }
+  state.name = document.getElementById('cfg-name').value || 'Torneo FIFA 2026';
+  state.players = players;
+  state.consoles = parseInt(document.getElementById('cfg-consoles').value);
+  state.started = true;
+
+  // Build bracket — pad to next power of 2 with BYE
+  const pow2 = nextPow2(n);
+  const seeded = seedOrder(pow2);
+  const paddedPlayers = [...players];
+  while(paddedPlayers.length < pow2) paddedPlayers.push('BYE');
+
+  state.rounds = [];
+  // Round 0
+  const r0 = [];
+  for(let i=0;i<pow2/2;i++) {
+    const p1 = paddedPlayers[seeded[i*2]];
+    const p2 = paddedPlayers[seeded[i*2+1]];
+    const m = { id: `r0m${i}`, round: 0, index: i, p1, p2, score1: null, score2: null, winner: null, console: null, status: 'pending' };
+    // Auto-advance BYEs
+    if(p2==='BYE') { m.winner=p1; m.status='done'; }
+    if(p1==='BYE') { m.winner=p2; m.status='done'; }
+    r0.push(m);
+  }
+  state.rounds.push(r0);
+
+  // Build remaining rounds
+  const totalRounds = Math.log2(pow2);
+  for(let r=1;r<totalRounds;r++) {
+    const prev = state.rounds[r-1];
+    const rnd = [];
+    for(let i=0;i<prev.length/2;i++) {
+      const w1 = prev[i*2].winner || 'TBD';
+      const w2 = prev[i*2+1].winner || 'TBD';
+      rnd.push({ id:`r${r}m${i}`, round:r, index:i, p1:w1, p2:w2, score1:null, score2:null, winner:null, console:null, status:'pending' });
+    }
+    state.rounds.push(rnd);
+  }
+
+  assignConsoles();
+  updateAll();
+  showView('display');
+  document.getElementById('tv-title').textContent = '⚽ ' + state.name.toUpperCase();
+}
+
+function nextPow2(n) { let p=1; while(p<n) p*=2; return p; }
+
+function seedOrder(n) {
+  // Standard bracket seeding
+  let s = [0, 1];
+  while(s.length < n) {
+    const ns = [];
+    const len = s.length * 2;
+    for(let i=0;i<s.length;i++) { ns.push(s[i]); ns.push(len-1-s[i]); }
+    s = ns;
+  }
+  return s;
+}
+
+// ==================== CONSOLE ASSIGNMENT ====================
+function assignConsoles() {
+  const c = state.consoles;
+  let slot = 1;
+  state.rounds.forEach(round => {
+    round.forEach(m => {
+      if(m.status !== 'done') {
+        if(!m.console) { m.console = slot; slot = slot%c + 1; }
+      }
+    });
+  });
+}
+
+function getPlayingMatches() {
+  const all = state.rounds.flat();
+  return all.filter(m => m.status === 'playing');
+}
+
+function getNextPendingMatches() {
+  const all = state.rounds.flat();
+  return all.filter(m => m.status === 'pending' && m.p1 !== 'TBD' && m.p2 !== 'TBD');
+}
+
+// ==================== MATCH RESOLUTION ====================
+function setScore(matchId, s1, s2) {
+  const m = getMatch(matchId);
+  if(!m) return;
+  m.score1 = s1; m.score2 = s2;
+}
+
+function setWinner(matchId, player) {
+  const m = getMatch(matchId);
+  if(!m || m.status === 'done') return;
+  if(m.winner === player) { m.winner = null; } else { m.winner = player; }
+}
+
+function confirmWinner(matchId) {
+  const m = getMatch(matchId);
+  if(!m || !m.winner) return;
+  // Read scores
+  const s1 = parseInt(document.getElementById(`s1-${matchId}`)?.value) ?? null;
+  const s2 = parseInt(document.getElementById(`s2-${matchId}`)?.value) ?? null;
+  m.score1 = isNaN(s1) ? null : s1;
+  m.score2 = isNaN(s2) ? null : s2;
+  m.status = 'done';
+  // Propagate to next round
+  propagate();
+  assignConsoles();
+  updateAll();
+}
+
+function startMatch(matchId) {
+  const m = getMatch(matchId);
+  if(!m) return;
+  m.status = 'playing';
+  if(!m.console) { m.console = nextFreeConsole(); }
+  updateAll();
+}
+
+function resetMatch(matchId) {
+  const m = getMatch(matchId);
+  if(!m) return;
+  m.winner = null; m.score1 = null; m.score2 = null; m.status = 'pending';
+  // Clear downstream
+  clearDownstream(m.round, m.index);
+  propagate();
+  updateAll();
+}
+
+function clearDownstream(round, index) {
+  for(let r=round+1;r<state.rounds.length;r++) {
+    const mi = Math.floor(index / Math.pow(2, r-round));
+    const m2 = state.rounds[r][mi];
+    if(m2) { m2.winner=null; m2.score1=null; m2.score2=null; m2.status='pending'; m2.p1='TBD'; m2.p2='TBD'; }
+  }
+}
+
+function nextFreeConsole() {
+  const used = getPlayingMatches().map(m=>m.console);
+  for(let i=1;i<=state.consoles;i++) { if(!used.includes(i)) return i; }
+  return 1;
+}
+
+function getMatch(id) { return state.rounds.flat().find(m=>m.id===id); }
+
+function propagate() {
+  for(let r=1;r<state.rounds.length;r++) {
+    const prev = state.rounds[r-1];
+    const cur = state.rounds[r];
+    for(let i=0;i<cur.length;i++) {
+      const w1 = prev[i*2]?.winner || 'TBD';
+      const w2 = prev[i*2+1]?.winner || 'TBD';
+      if(cur[i].p1 !== w1 || cur[i].p2 !== w2) {
+        if(cur[i].status !== 'done') { cur[i].p1=w1; cur[i].p2=w2; cur[i].winner=null; }
+      }
+    }
+  }
+}
+
+function roundName(r) {
+  const total = state.rounds.length;
+  if(r === total-1) return 'Final';
+  if(r === total-2) return 'Semifinal';
+  if(r === total-3) return 'Cuartos de Final';
+  if(r === total-4) return 'Octavos de Final';
+  return `Ronda ${r+1}`;
+}
+
+// ==================== RENDER ====================
+function updateAll() {
+  renderManage();
+  renderBracket();
+  renderDisplay();
+  renderStats();
+}
+
+function renderStats() {
+  const all = state.rounds.flat().filter(m=>m.p1!=='BYE'&&m.p2!=='BYE');
+  const done = all.filter(m=>m.status==='done').length;
+  const playing = all.filter(m=>m.status==='playing').length;
+  const pending = all.filter(m=>m.status==='pending').length;
+  const g = document.getElementById('stats-grid');
+  if(!g) return;
+  g.innerHTML = `
+    <div class="stat-card"><div class="stat-val">${all.length}</div><div class="stat-label">Total Partidos</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#4cde8c">${done}</div><div class="stat-label">Completados</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--gold)">${playing}</div><div class="stat-label">En Juego</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--text2)">${pending}</div><div class="stat-label">Pendientes</div></div>
+    <div class="stat-card"><div class="stat-val">${state.players.length}</div><div class="stat-label">Jugadores</div></div>
+  `;
+}
+
+// ---- MANAGE ----
+function renderManage() {
+  const b = document.getElementById('manage-body');
+  if(!b || !state.started) return;
+  let html = '';
+  state.rounds.forEach((round, ri) => {
+    const visible = round.filter(m=>m.p1!=='BYE'&&m.p2!=='BYE');
+    if(!visible.length) return;
+    html += `<div class="section-title" style="margin-top:20px">${roundName(ri)}</div>`;
+    html += `<div class="match-queue">`;
+    visible.forEach(m => {
+      const isPlaying = m.status==='playing';
+      const isDone = m.status==='done';
+      const isTBD = m.p1==='TBD'||m.p2==='TBD';
+      html += `<div class="match-card ${isPlaying?'playing':''} ${isDone?'done':''}" id="mc-${m.id}">`;
+      html += `<div class="match-meta">`;
+      html += `<span class="round-badge">${roundName(ri)}</span>`;
+      if(m.console) html += `<span class="console-badge">PS5 #${m.console}</span>`;
+      if(isDone) html += `<span style="font-size:11px;color:#4cde8c;margin-left:4px">✓ Completado</span>`;
+      if(isPlaying) html += `<span style="font-size:11px;color:var(--gold);margin-left:4px">● Jugando</span>`;
+      html += `</div>`;
+      if(isTBD) {
+        html += `<div class="tbd-notice">Esperando resultados de ronda anterior...</div>`;
+      } else {
+        html += `<div class="match-players">`;
+        html += `<div class="mp ${m.winner===m.p1?'winner':''} ${m.winner&&m.winner!==m.p1?'loser':''}" onclick="setWinner('${m.id}','${m.p1}')"><div style="font-size:11px;color:var(--text2);margin-bottom:2px">Jugador 1</div>${m.p1}</div>`;
+        html += `<div class="vs-label">VS</div>`;
+        html += `<div class="mp ${m.winner===m.p2?'winner':''} ${m.winner&&m.winner!==m.p2?'loser':''}" onclick="setWinner('${m.id}','${m.p2}')"><div style="font-size:11px;color:var(--text2);margin-bottom:2px">Jugador 2</div>${m.p2}</div>`;
+        html += `</div>`;
+        if(!isDone) {
+          html += `<div class="score-inputs">
+            <span style="font-size:12px;color:var(--text2)">Marcador:</span>
+            <input type="number" min="0" max="20" id="s1-${m.id}" placeholder="0" style="width:52px" value="${m.score1??''}">
+            <span class="score-sep">-</span>
+            <input type="number" min="0" max="20" id="s2-${m.id}" placeholder="0" style="width:52px" value="${m.score2??''}">
+          </div>`;
+        } else {
+          if(m.score1!==null) html += `<div style="font-size:13px;color:var(--text2);margin-bottom:8px">Marcador: <strong style="color:var(--gold)">${m.score1} - ${m.score2}</strong></div>`;
+        }
+        html += `<div class="match-actions">`;
+        if(!isDone && !isPlaying) html += `<button class="btn sm green" onclick="startMatch('${m.id}')">▶ Iniciar</button>`;
+        if(!isDone && m.winner) html += `<button class="btn sm gold" onclick="confirmWinner('${m.id}')">✓ Confirmar Ganador</button>`;
+        if(isDone) html += `<button class="btn sm danger" onclick="resetMatch('${m.id}')">↩ Revertir</button>`;
+        html += `</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+  b.innerHTML = html;
+}
+
+// ---- BRACKET ----
+function renderBracket() {
+  const c = document.getElementById('bracket-container');
+  if(!c || !state.started) return;
+  let html = `<div class="bracket-flex">`;
+  state.rounds.forEach((round, ri) => {
+    html += `<div class="b-round"><div class="b-round-label">${roundName(ri)}</div><div class="b-col">`;
+    round.forEach(m => {
+      if(m.p1==='BYE'||m.p2==='BYE') return;
+      const isActive = m.status==='playing';
+      html += `<div class="b-match ${isActive?'active-match':''}">`;
+      [['p1','score1'],['p2','score2']].forEach(([pk,sk]) => {
+        const p = m[pk]; const sc = m[sk];
+        const isW = m.winner===p && p!=='TBD';
+        const isL = m.winner && m.winner!==p && p!=='TBD';
+        const isTBD = p==='TBD';
+        html += `<div class="b-player ${isW?'winner':''} ${isL?'loser':''} ${isTBD?'tbd':''}">`;
+        html += `<span style="flex:1">${p}</span>`;
+        if(sc!==null && sc!==undefined) html += `<span class="b-score">${sc}</span>`;
+        if(isActive && m.console) html += `<span class="b-console">PS5#${m.console}</span>`;
+        html += `</div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+  c.innerHTML = html;
+}
+
+// ---- TV DISPLAY ----
+function renderDisplay() {
+  const b = document.getElementById('tv-body');
+  if(!b || !state.started) { b.innerHTML='<div style="text-align:center;padding:60px;color:rgba(255,255,255,0.3);font-size:18px">Configure y inicie el torneo primero.</div>'; return; }
+
+  // Check champion
+  const finalMatch = state.rounds[state.rounds.length-1]?.[0];
+  if(finalMatch?.winner && finalMatch.winner!=='TBD' && finalMatch.winner!=='BYE') {
+    b.innerHTML = `<div class="tv-champion">
+      <div class="tv-trophy">🏆</div>
+      <div class="tv-champion-label">CAMPEÓN DEL TORNEO</div>
+      <div class="tv-champion-name">${finalMatch.winner}</div>
+    </div>`;
+    return;
+  }
+
+  const playing = getPlayingMatches();
+  const nextUp = getNextPendingMatches().slice(0, 6);
+
+  let html = `<div class="tv-body">`;
+  html += `<div>`;
+
+  // Consoles
+  html += `<div class="tv-section-title">Consolas</div><div class="tv-consoles">`;
+  for(let ci=1;ci<=state.consoles;ci++) {
+    const m = playing.find(m=>m.console===ci);
+    html += `<div class="tv-console-card"><div class="tv-console-title">🎮 PS5 #${ci}</div>`;
+    if(m) {
+      const s1 = m.score1!==null ? m.score1 : '-';
+      const s2 = m.score2!==null ? m.score2 : '-';
+      html += `<div class="tv-console-match">
+        <div class="tv-player"><div class="tv-player-name">${m.p1}</div><div class="tv-player-score">${s1}</div></div>
+        <div class="tv-vs">VS</div>
+        <div class="tv-player"><div class="tv-player-name">${m.p2}</div><div class="tv-player-score">${s2}</div></div>
+      </div>
+      <div class="tv-round-tag">${roundName(m.round)}</div>`;
+    } else {
+      html += `<div class="tv-console-empty">Sin partido activo</div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</div>`;
+
+  // Bracket mini
+  html += `<div class="tv-section-title">Bracket</div><div class="tv-bracket-mini">`;
+  state.rounds.forEach((round, ri) => {
+    html += `<div class="tv-bm-round"><div class="tv-bm-label">${roundName(ri)}</div><div class="tv-bm-matches">`;
+    round.forEach(m => {
+      if(m.p1==='BYE'||m.p2==='BYE') return;
+      const isAct = m.status==='playing';
+      html += `<div class="tv-bm-match ${isAct?'active':''}">`;
+      ['p1','p2'].forEach((pk,pi) => {
+        const p = m[pk]; const isW = m.winner===p&&p!=='TBD'; const isL=m.winner&&m.winner!==p&&p!=='TBD';
+        html += `<div class="tv-bm-p ${isW?'w':''} ${isL?'l':''}">${p==='TBD'?'?':p}${m[pi===0?'score1':'score2']!==null?` (${m[pi===0?'score1':'score2']})`:''}</div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+  html += `</div>`;
+
+  // Right sidebar
+  html += `<div>`;
+  html += `<div class="tv-section-title">Siguiente en jugar</div>`;
+  if(nextUp.length) {
+    html += `<div class="tv-queue">`;
+    nextUp.forEach((m,i) => {
+      html += `<div class="tv-queue-item">
+        <div class="tv-queue-num">${i+1}</div>
+        <div>
+          <div class="tv-queue-names">${m.p1} <span style="color:var(--text2)">vs</span> ${m.p2}</div>
+          <div class="tv-queue-round">${roundName(m.round)} · PS5 #${m.console||'?'}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div style="color:var(--text2);font-size:13px;font-style:italic">No hay partidos pendientes.</div>`;
+  }
+  html += `</div>`;
+  html += `</div>`;
+  b.innerHTML = html;
+}
+
+// ==================== HELPERS ====================
+function showView(v) {
+  ['setup','manage','bracket','display'].forEach(x => {
+    document.getElementById(`view-${x}`).classList.toggle('active', x===v);
+    document.getElementById(`ntab-${x}`).classList.toggle('active', x===v);
+  });
+  if(v==='manage') { renderManage(); renderStats(); }
+  if(v==='bracket') renderBracket();
+  if(v==='display') renderDisplay();
+}
+
+// Clock
+function updateClock() {
+  const el = document.getElementById('tv-clock');
+  if(el) el.textContent = new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Init
+buildPlayerInputs();
+</script>
+</body>
+</html>
