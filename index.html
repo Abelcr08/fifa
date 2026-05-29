@@ -358,7 +358,6 @@ sb.auth.onAuthStateChange(async (event, session) => {
   updateNav();
   if(currentUser) {
     showView('torneos');
-    loadTorneos();
   } else {
     showView('auth');
   }
@@ -416,11 +415,18 @@ async function logout() {
 async function loadTorneos() {
   document.getElementById('loader-torneos').style.display='flex';
   document.getElementById('torneos-grid').innerHTML='';
-  document.getElementById('panel-torneo').style.display='none';
   const {data, error} = await sb.from('fifa_torneos').select('*').order('fecha', {ascending:false});
   document.getElementById('loader-torneos').style.display='none';
   if(error) return setMsg('torneos-grid', error.message, 'error');
   renderTorneos(data||[]);
+  // Si hay torneo activo, re-renderizar su panel con datos frescos
+  if(activeTorneo) {
+    const fresh = (data||[]).find(t => t.id === activeTorneo.id);
+    if(fresh) { activeTorneo = fresh; renderPanelTorneo(); loadInscripciones(); }
+    else { document.getElementById('panel-torneo').style.display='none'; }
+  } else {
+    document.getElementById('panel-torneo').style.display='none';
+  }
 }
 
 function renderTorneos(list) {
@@ -640,16 +646,7 @@ async function savePartidos() {
   await sb.from('fifa_partidos').insert(rows);
 }
 
-async function loadPartidos() {
-  if(!activeTorneo) return;
-  const {data} = await sb.from('fifa_partidos').select('*').eq('torneo_id', activeTorneo.id).order('ronda').order('posicion');
-  if(!data||!data.length) return;
-  // Rebuild rounds array
-  const maxRonda = Math.max(...data.map(m=>m.ronda));
-  rounds = [];
-  for(let r=0;r<=maxRonda;r++) rounds.push(data.filter(m=>m.ronda===r));
-  renderManage(); renderBracket(); renderDisplay();
-}
+
 
 function nextPow2(n){let p=1;while(p<n)p*=2;return p;}
 function seedOrder(n){let s=[0,1];while(s.length<n){const ns=[];const len=s.length*2;for(let i=0;i<s.length;i++){ns.push(s[i]);ns.push(len-1-s[i]);}s=ns;}return s;}
@@ -879,7 +876,7 @@ function showView(v) {
   if(v==='manage')  { loadPartidos(); }
   if(v==='bracket') { loadPartidos(); }
   if(v==='display') { loadPartidos(); startAutoRefresh(); }
-  if(v==='torneos') { loadTorneos(); if(activeTorneo) loadInscripciones(); }
+  if(v==='torneos') { loadTorneos(); }
   if(v!=='display') { stopAutoRefresh(); }
 }
 
@@ -919,11 +916,11 @@ function setMsg(id, msg, type='info') {
   el.innerHTML=msg?`<div class="alert ${type}">${msg}</div>`:'';
 }
 
-// Sobreescribir loadPartidos con version que refresca vistas y botones
-const _loadPartidosBase = loadPartidos;
-loadPartidos = async function() {
+// loadPartidos — carga partidos desde Supabase y refresca todas las vistas
+async function loadPartidos() {
   if(!activeTorneo) return;
-  const {data} = await sb.from('fifa_partidos').select('*').eq('torneo_id', activeTorneo.id).order('ronda').order('posicion');
+  const {data, error} = await sb.from('fifa_partidos').select('*').eq('torneo_id', activeTorneo.id).order('ronda').order('posicion');
+  if(error) { console.error('loadPartidos error:', error.message); return; }
   if(!data||!data.length) return;
   const maxRonda = Math.max(...data.map(m=>m.ronda));
   rounds = [];
