@@ -470,7 +470,7 @@ function renderPanelTorneo() {
     html += `<button class="btn sm" onclick="showView('bracket')">🏆 Bracket</button>`;
     html += `<button class="btn sm" onclick="showView('display')">📺 TV</button>`;
   }
-  if(isAdmin) html += `<button class="btn sm danger" onclick="borrarTorneo(${t.id}, '${t.nombre.replace(/'/g,'\\'')}')">🗑 Borrar torneo</button>`;
+  if(isAdmin) html += `<button class="btn sm danger" onclick="borrarTorneo(${t.id})">🗑 Borrar torneo</button>`;
   actions.innerHTML = html;
 }
 
@@ -485,7 +485,8 @@ function showNuevoTorneo() {
   document.getElementById('nt-fecha').value = hoy;
 }
 
-async function borrarTorneo(id, nombre) {
+async function borrarTorneo(id) {
+  const nombre = activeTorneo?.nombre || 'este torneo';
   const confirmado = confirm(`¿Seguro que querés borrar "${nombre}"?\n\nEsto eliminará el torneo, todas las inscripciones y todos los partidos. Esta acción no se puede deshacer.`);
   if(!confirmado) return;
   const confirmado2 = confirm(`Confirmación final: borrar "${nombre}" permanentemente.`);
