@@ -464,6 +464,7 @@ function renderPanelTorneo() {
     html += `<button class="btn sm" onclick="showView('bracket')">🏆 Bracket</button>`;
     html += `<button class="btn sm" onclick="showView('display')">📺 TV</button>`;
   }
+  if(isAdmin) html += `<button class="btn sm danger" onclick="borrarTorneo(${t.id}, '${t.nombre.replace(/'/g,'\\'')}')">🗑 Borrar torneo</button>`;
   actions.innerHTML = html;
 }
 
@@ -476,6 +477,25 @@ function showNuevoTorneo() {
   c.style.display = c.style.display==='none' ? '' : 'none';
   const hoy = new Date().toISOString().split('T')[0];
   document.getElementById('nt-fecha').value = hoy;
+}
+
+async function borrarTorneo(id, nombre) {
+  const confirmado = confirm(`¿Seguro que querés borrar "${nombre}"?\n\nEsto eliminará el torneo, todas las inscripciones y todos los partidos. Esta acción no se puede deshacer.`);
+  if(!confirmado) return;
+  const confirmado2 = confirm(`Confirmación final: borrar "${nombre}" permanentemente.`);
+  if(!confirmado2) return;
+  // Borrar partidos e inscripciones primero (CASCADE debería hacerlo, pero por si acaso)
+  await sb.from('fifa_partidos').delete().eq('torneo_id', id);
+  await sb.from('fifa_inscripciones').delete().eq('torneo_id', id);
+  const {error} = await sb.from('fifa_torneos').delete().eq('id', id);
+  if(error) return alert('Error al borrar: ' + error.message);
+  if(activeTorneo?.id === id) {
+    activeTorneo = null;
+    rounds = [];
+    updateNav();
+    document.getElementById('panel-torneo').style.display = 'none';
+  }
+  await loadTorneos();
 }
 
 async function crearTorneo() {
