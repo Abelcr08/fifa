@@ -328,7 +328,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
       <div class="tv-logo" id="tv-title">⚽ FIFA 2026</div>
       <div class="tv-sub">Parque Tempisque · En vivo</div>
     </div>
-    <div id="tv-clock" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:rgba(255,255,255,.4);letter-spacing:2px;"></div>
+    <div style="text-align:right">
+      <div id="tv-clock" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:rgba(255,255,255,.4);letter-spacing:2px;"></div>
+      <div id="tv-last-refresh" style="font-size:11px;color:rgba(255,255,255,.25);margin-top:2px;letter-spacing:1px;"></div>
+    </div>
   </div>
   <div id="tv-body"></div>
 </div>
@@ -368,7 +371,8 @@ function updateNav() {
     if(!el) return;
     if(!currentUser) { el.classList.add('hidden'); return; }
     if(t==='display') { el.classList.toggle('hidden', !activeTorneo); return; }
-    if(t==='manage'||t==='bracket') { el.classList.toggle('hidden', !activeTorneo || !isAdmin); return; }
+    if(t==='bracket') { el.classList.toggle('hidden', !activeTorneo); return; }
+    if(t==='manage') { el.classList.toggle('hidden', !activeTorneo || !isAdmin); return; }
     el.classList.remove('hidden');
   });
   document.getElementById('nav-user').textContent = currentUser ? (currentUser.user_metadata?.username || currentUser.email) : '';
@@ -454,10 +458,10 @@ function renderPanelTorneo() {
   let html = `<button class="btn sm" onclick="openInscripcion()">🔗 Link inscripción</button>`;
   if(isAdmin) {
     if(t.estado==='inscripcion') html += `<button class="btn sm green" onclick="iniciarTorneo()">🚀 Iniciar torneo</button>`;
-    if(t.estado==='en_curso') {
-      html += `<button class="btn sm" onclick="showView('manage')">🎮 Partidos</button>`;
-      html += `<button class="btn sm" onclick="showView('bracket')">🏆 Bracket</button>`;
-    }
+    if(t.estado==='en_curso') html += `<button class="btn sm" onclick="showView('manage')">🎮 Partidos</button>`;
+  }
+  if(t.estado==='en_curso') {
+    html += `<button class="btn sm" onclick="showView('bracket')">🏆 Bracket</button>`;
     html += `<button class="btn sm" onclick="showView('display')">📺 TV</button>`;
   }
   actions.innerHTML = html;
@@ -841,22 +845,74 @@ function renderDisplay(){
 }
 
 // ===================== HELPERS =====================
+let currentView = 'auth';
+let autoRefreshInterval = null;
+
 function showView(v) {
+  currentView = v;
   ['auth','inscripcion','torneos','manage','bracket','display'].forEach(x=>{
     const el=document.getElementById(`view-${x}`);
     if(el)el.classList.toggle('active',x===v);
     const nt=document.getElementById(`ntab-${x}`);
     if(nt)nt.classList.toggle('active',x===v);
   });
-  if(v==='manage'){renderManage();renderStats();}
-  if(v==='bracket')renderBracket();
-  if(v==='display')renderDisplay();
-  if(v==='torneos'&&activeTorneo&&activeTorneo.estado==='en_curso')loadPartidos();
+  if(v==='manage')  { loadPartidos(); }
+  if(v==='bracket') { loadPartidos(); }
+  if(v==='display') { loadPartidos(); startAutoRefresh(); }
+  if(v==='torneos') { loadTorneos(); if(activeTorneo) loadInscripciones(); }
+  if(v!=='display') { stopAutoRefresh(); }
+}
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  autoRefreshInterval = setInterval(async () => {
+    if(currentView === 'display' && activeTorneo) await loadPartidos();
+  }, 10000);
+}
+
+function stopAutoRefresh() {
+  if(autoRefreshInterval) { clearInterval(autoRefreshInterval); autoRefreshInterval = null; }
+}
+
+async function manualRefresh() {
+  const btn = document.getElementById('btn-refresh');
+  if(btn) { btn.textContent = '↻ Actualizando...'; btn.disabled = true; }
+  await loadPartidos();
+  if(btn) { btn.textContent = '↻ Actualizar'; btn.disabled = false; }
+}
+
+function injectRefreshBtn(viewId) {
+  if(document.getElementById('btn-refresh')) return;
+  const titleEl = document.querySelector('#view-' + viewId + ' .section-title');
+  if(!titleEl) return;
+  const btn = document.createElement('button');
+  btn.id = 'btn-refresh';
+  btn.className = 'btn sm';
+  btn.style.cssText = 'margin-left:12px;vertical-align:middle;font-size:12px;';
+  btn.innerHTML = '↻ Actualizar';
+  btn.onclick = manualRefresh;
+  titleEl.appendChild(btn);
 }
 
 function setMsg(id, msg, type='info') {
   const el=document.getElementById(id);if(!el)return;
   el.innerHTML=msg?`<div class="alert ${type}">${msg}</div>`:'';
+}
+
+// Sobreescribir loadPartidos con version que refresca vistas y botones
+const _loadPartidosBase = loadPartidos;
+loadPartidos = async function() {
+  if(!activeTorneo) return;
+  const {data} = await sb.from('fifa_partidos').select('*').eq('torneo_id', activeTorneo.id).order('ronda').order('posicion');
+  if(!data||!data.length) return;
+  const maxRonda = Math.max(...data.map(m=>m.ronda));
+  rounds = [];
+  for(let r=0;r<=maxRonda;r++) rounds.push(data.filter(m=>m.ronda===r));
+  renderManage(); renderBracket(); renderDisplay(); renderStats();
+  if(currentView==='manage')  setTimeout(()=>injectRefreshBtn('manage'), 60);
+  if(currentView==='bracket') setTimeout(()=>injectRefreshBtn('bracket'), 60);
+  const ind = document.getElementById('tv-last-refresh');
+  if(ind) ind.textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 
 // Clock
