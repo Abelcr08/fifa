@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d0d0d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FIFA 2026">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Torneo FIFA 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -187,6 +194,7 @@ input:focus,select:focus{border-color:var(--green-mid);}
     <div class="nav-tab hidden" id="ntab-display"  onclick="showView('display')">📺 Pantalla TV</div>
   </div>
   <div class="nav-right">
+    <button class="btn sm" id="btn-install" style="display:none;background:var(--green);color:#fff;border-color:var(--green-mid)" onclick="installApp()">📲 Instalar</button>
     <div class="nav-user" id="nav-user"></div>
     <button class="btn sm" id="btn-logout" style="display:none" onclick="logout()">Salir</button>
   </div>
@@ -1019,6 +1027,35 @@ if (torneoParam) {
     if (!session) loadTorneoPublico(torneoParam);
     // Si hay sesión, el onAuthStateChange lo maneja
   });
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// Install prompt — mostrar botón "Instalar app"
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('btn-install');
+  if (btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  const btn = document.getElementById('btn-install');
+  if (btn) btn.style.display = 'none';
+});
+async function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
 }
 </script>
 </body>
