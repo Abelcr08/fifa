@@ -562,29 +562,52 @@ async function iniciarTorneo() {
 
 // ===================== BRACKET LOGIC =====================
 function buildRounds(players, consolasCount) {
-  const pow2 = nextPow2(players.length);
-  const seeded = seedOrder(pow2);
-  const padded = [...players];
-  while (padded.length < pow2) padded.push('BYE');
+  // Opción B: los jugadores con mejor seed (top) tienen bye, el resto juega R0.
+  // Los bye players se distribuyen UNO por partido en R1, no juntos.
+  // Ej 6 jugadores: P1 y P2 tienen bye. R0: P3vsP4, P5vsP6.
+  // R1: P1 vs ganador(P3vsP4),  P2 vs ganador(P5vsP6).
+  const n = players.length;
+  const pow2 = nextPow2(n);
+  const byeCount = pow2 - n;
+  const ts = Date.now();
   rounds = [];
+
+  const byePlayers = players.slice(0, byeCount);   // avanzan directo
+  const r0Players  = players.slice(byeCount);       // juegan R0
+
+  // R0: partidos entre los jugadores sin bye
   const r0 = [];
-  for (let i = 0; i < pow2 / 2; i++) {
-    const p1 = padded[seeded[i * 2]], p2 = padded[seeded[i * 2 + 1]];
-    const m = { id: Date.now() + i, torneo_id: activeTorneo.id, ronda: 0, posicion: i, p1, p2, score1: null, score2: null, ganador: null, consola: null, estado: 'pendiente' };
-    if (p2 === 'BYE') { m.ganador = p1; m.estado = 'completado'; }
-    if (p1 === 'BYE') { m.ganador = p2; m.estado = 'completado'; }
-    r0.push(m);
+  for (let i = 0; i < r0Players.length / 2; i++) {
+    r0.push({ id: ts + i, torneo_id: activeTorneo.id, ronda: 0, posicion: i,
+      p1: r0Players[i * 2], p2: r0Players[i * 2 + 1],
+      score1: null, score2: null, ganador: null, consola: null, estado: 'pendiente' });
   }
-  rounds.push(r0);
+  if (r0.length > 0) rounds.push(r0);
+
+  // Rondas siguientes
   const totalR = Math.log2(pow2);
-  for (let r = 1; r < totalR; r++) {
-    const prev = rounds[r - 1], rnd = [];
-    for (let i = 0; i < prev.length / 2; i++) {
-      const w1 = prev[i * 2].ganador || 'TBD', w2 = prev[i * 2 + 1].ganador || 'TBD';
-      rnd.push({ id: Date.now() + r * 1000 + i, torneo_id: activeTorneo.id, ronda: r, posicion: i, p1: w1, p2: w2, score1: null, score2: null, ganador: null, consola: null, estado: 'pendiente' });
+  const startR = r0.length > 0 ? 1 : 0;
+
+  for (let r = startR; r < totalR; r++) {
+    const matchCount = pow2 / Math.pow(2, r);   // total jugadores en esta ronda
+    const numMatches = matchCount / 2;
+    const rnd = [];
+    for (let i = 0; i < numMatches; i++) {
+      let p1 = 'TBD', p2 = 'TBD';
+      if (r === startR) {
+        // Llenar slots en orden: primero bye players, luego TBD (ganadores R0)
+        // Slot global = i*2 y i*2+1 dentro del array de esta ronda
+        // Primeros byeCount slots = bye players, resto = TBD
+        const slotA = i * 2, slotB = i * 2 + 1;
+        p1 = slotA < byePlayers.length ? byePlayers[slotA] : 'TBD';
+        p2 = slotB < byePlayers.length ? byePlayers[slotB] : 'TBD';
+      }
+      rnd.push({ id: ts + r * 10000 + i, torneo_id: activeTorneo.id, ronda: r, posicion: i,
+        p1, p2, score1: null, score2: null, ganador: null, consola: null, estado: 'pendiente' });
     }
     rounds.push(rnd);
   }
+
   assignConsoles(consolasCount);
 }
 
@@ -660,11 +683,22 @@ async function resetMatch(matchId) {
 }
 
 function propagate() {
+  // Con byes: R0 puede tener menos partidos que R1.
+  // Los ganadores de R0 llenan los slots de R1 que NO son bye players.
+  // Identificamos cuántos bye players hay en R1 (slots con p1/p2 ya definidos desde buildRounds)
   for (let r = 1; r < rounds.length; r++) {
     const prev = rounds[r - 1], cur = rounds[r];
+    // Contar bye players en esta ronda (jugadores que ya tenían nombre desde buildRounds)
+    // Los ganadores de prev van a llenar los slots TBD de cur en orden
+    let prevWinners = prev.map(m => m.ganador || null).filter(g => g !== null);
+    let winIdx = 0;
     for (let i = 0; i < cur.length; i++) {
-      const w1 = prev[i * 2]?.ganador || 'TBD', w2 = prev[i * 2 + 1]?.ganador || 'TBD';
-      if (cur[i].estado !== 'completado') { cur[i].p1 = w1; cur[i].p2 = w2; cur[i].ganador = null; }
+      if (cur[i].estado === 'completado') continue;
+      let newP1 = cur[i].p1, newP2 = cur[i].p2;
+      if (newP1 === 'TBD') { newP1 = prevWinners[winIdx++] || 'TBD'; }
+      if (newP2 === 'TBD') { newP2 = prevWinners[winIdx++] || 'TBD'; }
+      cur[i].p1 = newP1;
+      cur[i].p2 = newP2;
     }
   }
 }
