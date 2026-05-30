@@ -8,11 +8,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --green:#1a4a2e; --green-mid:#2d7a4f; --green-light:#e8f5ee;
-  --gold:#f0a500; --gold-light:#fff8e7;
-  --red:#c0392b; --bg:#0d0d0d; --bg2:#141414; --bg3:#1c1c1c;
+  --green:#1a4a2e; --green-mid:#2d7a4f;
+  --gold:#f0a500;
+  --bg:#0d0d0d; --bg2:#141414; --bg3:#1c1c1c;
   --border:rgba(255,255,255,0.08); --text:#f0f0f0; --text2:#888;
-  --ps5:#003087; --ps5b:#0070cc;
+  --ps5:#003087;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
@@ -34,17 +34,17 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:10px 2
 .view{display:none;padding:20px;}
 .view.active{display:block;}
 
-/* CARDS & FORMS */
+/* BASE */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px;}
 .card-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1.5px;color:var(--gold);margin-bottom:14px;}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
 .field label{font-size:12px;color:var(--text2);}
-input[type=text],input[type=email],input[type=password],input[type=number],select,textarea{
+input[type=text],input[type=email],input[type=password],input[type=number],select{
   background:var(--bg3);border:1px solid var(--border);border-radius:7px;
   color:var(--text);padding:9px 12px;font-size:13px;font-family:inherit;outline:none;transition:border-color .2s;width:100%;
 }
-input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
+input:focus,select:focus{border-color:var(--green-mid);}
 .btn{padding:9px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
 .btn:hover{background:#222;border-color:rgba(255,255,255,.2);}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
@@ -62,15 +62,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
 .alert.warn{background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.3);color:var(--gold);}
 
 /* AUTH */
-.auth-wrap{max-width:420px;margin:60px auto;}
+.auth-wrap{max-width:400px;margin:60px auto;}
 .auth-logo{text-align:center;margin-bottom:28px;}
 .auth-logo div{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:var(--gold);}
 .auth-logo p{font-size:13px;color:var(--text2);margin-top:4px;}
-.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;}
-.auth-tab{flex:1;padding:10px;text-align:center;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
-.auth-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
 
-/* TORNEOS LIST */
+/* TORNEOS */
 .torneos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px;}
 .torneo-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;}
 .torneo-card:hover{border-color:var(--gold);background:rgba(240,165,0,.04);}
@@ -82,32 +79,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
 .badge.en_curso{background:rgba(240,165,0,.15);color:var(--gold);border:1px solid rgba(240,165,0,.3);}
 .badge.finalizado{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
 
-/* INSCRIPCIONES */
-.inscripciones-list{display:flex;flex-direction:column;gap:8px;}
-.insc-row{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;}
-.insc-avatar{width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;}
-.insc-info{flex:1;min-width:0;}
-.insc-name{font-size:14px;font-weight:500;}
-.insc-email{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.badge.pendiente{background:rgba(240,165,0,.12);color:var(--gold);border:1px solid rgba(240,165,0,.3);}
-.badge.aprobado{background:rgba(26,74,46,.3);color:#4cde8c;border:1px solid rgba(45,122,79,.4);}
-.badge.rechazado{background:rgba(192,57,43,.15);color:#e74c3c;border:1px solid rgba(192,57,43,.3);}
+/* JUGADORES */
+.jugadores-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-bottom:14px;}
+.player-inp{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;}
+.player-num{width:22px;height:22px;border-radius:50%;background:var(--green);font-size:11px;font-weight:600;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.player-inp input{background:transparent;border:none;color:var(--text);font-size:13px;width:100%;padding:0;}
+.player-inp input:focus{outline:none;}
+.jugador-tag{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 12px;}
+.jugador-avatar{width:28px;height:28px;border-radius:50%;background:var(--green);font-size:11px;font-weight:600;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.jugador-nombre{flex:1;font-size:13px;}
+.jugador-num{font-size:11px;color:var(--text2);}
 
-/* BRACKET */
-.bracket-scroll{overflow-x:auto;padding-bottom:16px;}
-.bracket-flex{display:flex;gap:0;min-width:fit-content;}
-.b-round{min-width:160px;flex:1;}
-.b-round-label{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.5px;color:var(--gold);text-align:center;padding:8px 6px;border-bottom:1px solid var(--border);margin-bottom:8px;}
-.b-col{display:flex;flex-direction:column;justify-content:space-around;padding:0 5px;}
-.b-match{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:6px 0;}
-.b-match.playing{border-color:var(--gold);box-shadow:0 0 10px rgba(240,165,0,.18);}
-.b-player{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px;border-bottom:1px solid var(--border);}
-.b-player:last-child{border-bottom:none;}
-.b-player.winner{background:rgba(26,74,46,.35);color:#4cde8c;font-weight:600;}
-.b-player.loser{opacity:.35;text-decoration:line-through;}
-.b-player.tbd{color:var(--text2);font-style:italic;font-size:12px;}
-.b-score{margin-left:auto;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);}
-.b-console-tag{font-size:10px;padding:2px 5px;background:var(--ps5);color:#fff;border-radius:3px;font-weight:600;}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:16px;}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);}
+.stat-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
 
 /* MANAGE */
 .match-queue{display:flex;flex-direction:column;gap:10px;}
@@ -129,11 +116,21 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
 .score-sep{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text2);}
 .tbd-notice{font-size:12px;color:var(--text2);font-style:italic;text-align:center;padding:8px 0;}
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:16px;}
-.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
-.stat-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);}
-.stat-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+/* BRACKET */
+.bracket-scroll{overflow-x:auto;padding-bottom:16px;}
+.bracket-flex{display:flex;gap:0;min-width:fit-content;}
+.b-round{min-width:160px;flex:1;}
+.b-round-label{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.5px;color:var(--gold);text-align:center;padding:8px 6px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.b-col{display:flex;flex-direction:column;justify-content:space-around;padding:0 5px;}
+.b-match{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:6px 0;}
+.b-match.playing{border-color:var(--gold);box-shadow:0 0 10px rgba(240,165,0,.18);}
+.b-player{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px;border-bottom:1px solid var(--border);}
+.b-player:last-child{border-bottom:none;}
+.b-player.winner{background:rgba(26,74,46,.35);color:#4cde8c;font-weight:600;}
+.b-player.loser{opacity:.35;text-decoration:line-through;}
+.b-player.tbd{color:var(--text2);font-style:italic;font-size:12px;}
+.b-score{margin-left:auto;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);}
+.b-console-tag{font-size:10px;padding:2px 5px;background:var(--ps5);color:#fff;border-radius:3px;font-weight:600;}
 
 /* TV */
 #view-display{background:#000;min-height:100vh;padding:0;}
@@ -171,11 +168,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
 .tv-ch-label{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:rgba(255,255,255,.45);margin-bottom:6px;}
 .tv-ch-name{font-family:'Bebas Neue',sans-serif;font-size:66px;letter-spacing:5px;color:var(--gold);text-shadow:0 0 40px rgba(240,165,0,.5);}
 
-/* INSCRIPCION PUBLICA */
-.insc-public-wrap{max-width:480px;margin:40px auto;}
-.insc-header{text-align:center;margin-bottom:24px;}
-.insc-torneo-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--gold);}
-
 /* LOADER */
 .loader{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px;padding:20px 0;}
 .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
@@ -189,11 +181,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
 <nav>
   <div class="nav-logo">⚽ FIFA 2026</div>
   <div class="nav-tabs">
-    <div class="nav-tab hidden" id="ntab-inscripcion" onclick="showView('inscripcion')">📋 Inscripción</div>
-    <div class="nav-tab hidden" id="ntab-torneos"     onclick="showView('torneos')">📅 Torneos</div>
-    <div class="nav-tab hidden" id="ntab-manage"      onclick="showView('manage')">🎮 Partidos</div>
-    <div class="nav-tab hidden" id="ntab-bracket"     onclick="showView('bracket')">🏆 Bracket</div>
-    <div class="nav-tab hidden" id="ntab-display"     onclick="showView('display')">📺 Pantalla TV</div>
+    <div class="nav-tab hidden" id="ntab-torneos"  onclick="showView('torneos')">📅 Torneos</div>
+    <div class="nav-tab hidden" id="ntab-manage"   onclick="showView('manage')">🎮 Partidos</div>
+    <div class="nav-tab hidden" id="ntab-bracket"  onclick="showView('bracket')">🏆 Bracket</div>
+    <div class="nav-tab hidden" id="ntab-display"  onclick="showView('display')">📺 Pantalla TV</div>
   </div>
   <div class="nav-right">
     <div class="nav-user" id="nav-user"></div>
@@ -206,50 +197,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
   <div class="auth-wrap">
     <div class="auth-logo">
       <div>⚽ TORNEO FIFA 2026</div>
-      <p>Parque Tempisque</p>
+      <p>Parque Tempisque — Admin</p>
     </div>
     <div class="card">
-      <div class="auth-tabs">
-        <div class="auth-tab active" id="atab-login" onclick="switchAuthTab('login')">Iniciar sesión</div>
-        <div class="auth-tab" id="atab-register" onclick="switchAuthTab('register')">Registrarse</div>
-      </div>
       <div id="auth-msg"></div>
-      <!-- LOGIN -->
-      <div id="form-login">
-        <div class="field"><label>Correo</label><input type="email" id="l-email" placeholder="correo@ejemplo.com"></div>
-        <div class="field"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••"></div>
-        <button class="btn green" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">Entrar</button>
-      </div>
-      <!-- REGISTER -->
-      <div id="form-register" style="display:none">
-        <div class="field"><label>Nombre de usuario</label><input type="text" id="r-user" placeholder="TuNick"></div>
-        <div class="field"><label>Correo</label><input type="email" id="r-email" placeholder="correo@ejemplo.com"></div>
-        <div class="field"><label>Contraseña</label><input type="password" id="r-pass" placeholder="Mínimo 6 caracteres"></div>
-        <button class="btn green" style="width:100%;justify-content:center;margin-top:4px" onclick="doRegister()">Crear cuenta</button>
-        <p style="font-size:11px;color:var(--text2);margin-top:10px;text-align:center">Después del registro revisá tu correo para confirmar tu cuenta.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- INSCRIPCION PUBLICA (jugador se inscribe a un torneo) -->
-<div class="view" id="view-inscripcion">
-  <div class="insc-public-wrap">
-    <div class="insc-header">
-      <div class="insc-torneo-name" id="insc-torneo-nombre">Torneo</div>
-      <div style="font-size:12px;color:var(--text2);margin-top:4px" id="insc-torneo-fecha"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Inscribirse al torneo</div>
-      <div id="insc-msg"></div>
-      <div id="insc-form">
-        <div class="field"><label>Nombre de usuario (visible en bracket)</label><input type="text" id="insc-username" placeholder="TuNick" maxlength="20"></div>
-        <div class="field"><label>Correo electrónico</label><input type="email" id="insc-email" placeholder="correo@ejemplo.com"></div>
-        <button class="btn gold" style="width:100%;justify-content:center;margin-top:4px" onclick="doInscripcion()">Inscribirme</button>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:12px">
-      <button class="btn sm" onclick="showView('torneos')">← Ver todos los torneos</button>
+      <div class="field"><label>Correo</label><input type="email" id="l-email" placeholder="correo@ejemplo.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn green" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">Entrar</button>
     </div>
   </div>
 </div>
@@ -258,26 +212,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
 <div class="view" id="view-torneos">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
     <div class="section-title" style="margin:0">Torneos</div>
-    <button class="btn green" id="btn-nuevo-torneo" style="display:none" onclick="showNuevoTorneo()">+ Nuevo torneo</button>
+    <button class="btn green" onclick="showNuevoTorneo()">+ Nuevo torneo</button>
   </div>
 
-  <!-- Formulario nuevo torneo (admin) -->
+  <!-- Formulario nuevo torneo -->
   <div class="card" id="card-nuevo-torneo" style="display:none">
     <div class="card-title">Crear torneo</div>
     <div id="nt-msg"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div class="field"><label>Nombre</label><input type="text" id="nt-nombre" placeholder="Torneo FIFA Mayo 2026"></div>
       <div class="field"><label>Fecha</label><input type="date" id="nt-fecha"></div>
-      <div class="field"><label>Máximo de jugadores</label>
-        <select id="nt-max">
-          <option value="4">4</option><option value="8" selected>8</option>
-          <option value="16">16</option><option value="32">32</option>
-        </select>
-      </div>
       <div class="field"><label>Consolas PS5</label>
         <select id="nt-consolas">
-          <option value="1">1</option><option value="2" selected>2</option>
-          <option value="3">3</option><option value="4">4</option>
+          <option value="1">1 PS5</option>
+          <option value="2" selected>2 PS5</option>
+          <option value="3">3 PS5</option>
+          <option value="4">4 PS5</option>
         </select>
       </div>
     </div>
@@ -287,10 +237,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
     </div>
   </div>
 
-  <div class="loader" id="loader-torneos"><div class="spinner"></div>Cargando torneos...</div>
+  <div class="loader" id="loader-torneos"><div class="spinner"></div>Cargando...</div>
   <div class="torneos-grid" id="torneos-grid"></div>
 
-  <!-- Panel del torneo seleccionado -->
+  <!-- Panel torneo seleccionado -->
   <div id="panel-torneo" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div>
@@ -300,10 +250,25 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
       <div class="btn-row" id="pt-actions"></div>
     </div>
 
-    <!-- Inscripciones -->
-    <div class="card">
-      <div class="card-title" id="insc-count-label">Inscripciones</div>
-      <div id="inscripciones-list"></div>
+    <!-- Gestión de jugadores -->
+    <div class="card" id="card-jugadores">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-title" style="margin:0" id="jugadores-count-label">Jugadores</div>
+        <button class="btn sm green" id="btn-agregar-jugador" onclick="mostrarFormJugador()">+ Agregar jugador</button>
+      </div>
+
+      <!-- Form agregar jugador -->
+      <div id="form-jugador" style="display:none;margin-bottom:14px;">
+        <div style="display:flex;gap:8px;align-items:flex-end;">
+          <div class="field" style="flex:1;margin:0"><label>Nombre del jugador</label><input type="text" id="inp-jugador" placeholder="Nombre o apodo" maxlength="20" onkeydown="if(event.key==='Enter')agregarJugador()"></div>
+          <button class="btn green sm" onclick="agregarJugador()">Agregar</button>
+          <button class="btn sm" onclick="ocultarFormJugador()">Cancelar</button>
+        </div>
+        <div id="jugador-msg" style="margin-top:8px"></div>
+      </div>
+
+      <div id="jugadores-list"></div>
+      <div class="btn-row" style="margin-top:12px" id="btn-iniciar-wrap"></div>
     </div>
   </div>
 </div>
@@ -336,108 +301,106 @@ input:focus,select:focus,textarea:focus{border-color:var(--green-mid);}
   <div id="tv-body"></div>
 </div>
 
+<!-- BRACKET / TV público (sin login) -->
+<div class="view" id="view-public">
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <button class="btn sm active" id="pub-tab-bracket" onclick="pubTab('bracket')">🏆 Bracket</button>
+    <button class="btn sm" id="pub-tab-tv" onclick="pubTab('tv')">📺 Pantalla TV</button>
+  </div>
+  <div id="pub-bracket"></div>
+  <div id="pub-tv" style="display:none"></div>
+</div>
+
 <script>
-// ===================== SUPABASE =====================
 const SUPA_URL = 'https://vcdgurkuoqsdvwvpnevr.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZGd1cmt1b3FzZHZ3dnBuZXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MjYxNDQsImV4cCI6MjA4ODMwMjE0NH0._fC7LXnggqXyniyOAb2orZj-QHY1_Xrf_-FnKVju9S8';
+const ADMIN_EMAILS = ['acampop@parquetempisque.com'];
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-// ADMIN emails — agregá los correos admin acá
-const ADMIN_EMAILS = ['acamposp@parquetempisque.com'];
-
-// ===================== STATE =====================
 let currentUser = null;
-let isAdmin = false;
-let activeTorneo = null;   // torneo seleccionado
-let rounds = [];           // partidos en memoria
+let activeTorneo = null;
+let rounds = [];
+let currentView = 'auth';
+let autoRefreshInterval = null;
 
 // ===================== AUTH =====================
 sb.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user || null;
-  isAdmin = currentUser ? ADMIN_EMAILS.includes(currentUser.email) : false;
   updateNav();
-  if(currentUser) {
+  if (currentUser) {
     showView('torneos');
   } else {
-    showView('auth');
+    // Si hay torneo en URL, mostrar vista pública
+    const torneoId = getUrlTorneo();
+    if (torneoId) {
+      await loadTorneoPublico(torneoId);
+    } else {
+      showView('auth');
+    }
   }
 });
 
+function getUrlTorneo() {
+  return new URLSearchParams(location.search).get('torneo');
+}
+
 function updateNav() {
-  const tabs = ['inscripcion','torneos','manage','bracket','display'];
-  tabs.forEach(t => {
-    const el = document.getElementById(`ntab-${t}`);
-    if(!el) return;
-    if(!currentUser) { el.classList.add('hidden'); return; }
-    if(t==='display') { el.classList.toggle('hidden', !activeTorneo); return; }
-    if(t==='bracket') { el.classList.toggle('hidden', !activeTorneo); return; }
-    if(t==='manage') { el.classList.toggle('hidden', !activeTorneo || !isAdmin); return; }
+  const isAdmin = ADMIN_EMAILS.includes(currentUser?.email);
+  ['torneos','manage','bracket','display'].forEach(t => {
+    const el = document.getElementById('ntab-' + t);
+    if (!el) return;
+    if (!currentUser) { el.classList.add('hidden'); return; }
+    if (t === 'manage') { el.classList.toggle('hidden', !activeTorneo); return; }
+    if (t === 'bracket' || t === 'display') { el.classList.toggle('hidden', !activeTorneo); return; }
     el.classList.remove('hidden');
   });
   document.getElementById('nav-user').textContent = currentUser ? (currentUser.user_metadata?.username || currentUser.email) : '';
   document.getElementById('btn-logout').style.display = currentUser ? '' : 'none';
-  document.getElementById('btn-nuevo-torneo') && (document.getElementById('btn-nuevo-torneo').style.display = isAdmin ? '' : 'none');
-}
-
-function switchAuthTab(t) {
-  document.getElementById('form-login').style.display  = t==='login' ? '' : 'none';
-  document.getElementById('form-register').style.display = t==='register' ? '' : 'none';
-  document.getElementById('atab-login').classList.toggle('active', t==='login');
-  document.getElementById('atab-register').classList.toggle('active', t==='register');
-  document.getElementById('auth-msg').innerHTML='';
 }
 
 async function doLogin() {
   const email = document.getElementById('l-email').value.trim();
   const pass  = document.getElementById('l-pass').value;
-  setMsg('auth-msg','');
-  const {error} = await sb.auth.signInWithPassword({email, password:pass});
-  if(error) setMsg('auth-msg', error.message, 'error');
-}
-
-async function doRegister() {
-  const username = document.getElementById('r-user').value.trim();
-  const email    = document.getElementById('r-email').value.trim();
-  const pass     = document.getElementById('r-pass').value;
-  if(!username||!email||!pass) return setMsg('auth-msg','Completá todos los campos','error');
-  setMsg('auth-msg','');
-  const {error} = await sb.auth.signUp({email, password:pass, options:{data:{username}}});
-  if(error) setMsg('auth-msg', error.message, 'error');
-  else setMsg('auth-msg','¡Cuenta creada! Revisá tu correo para confirmar.','info');
+  if (!email || !pass) return setMsg('auth-msg', 'Completá correo y contraseña', 'error');
+  setMsg('auth-msg', '');
+  const btn = document.querySelector('#view-auth .btn.green');
+  btn.textContent = 'Entrando...'; btn.disabled = true;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.textContent = 'Entrar'; btn.disabled = false;
+  if (error) setMsg('auth-msg', 'Correo o contraseña incorrectos', 'error');
 }
 
 async function logout() {
   await sb.auth.signOut();
   activeTorneo = null; rounds = [];
+  updateNav();
 }
 
 // ===================== TORNEOS =====================
 async function loadTorneos() {
-  document.getElementById('loader-torneos').style.display='flex';
-  document.getElementById('torneos-grid').innerHTML='';
-  const {data, error} = await sb.from('fifa_torneos').select('*').order('fecha', {ascending:false});
-  document.getElementById('loader-torneos').style.display='none';
-  if(error) return setMsg('torneos-grid', error.message, 'error');
-  renderTorneos(data||[]);
-  // Si hay torneo activo, re-renderizar su panel con datos frescos
-  if(activeTorneo) {
-    const fresh = (data||[]).find(t => t.id === activeTorneo.id);
-    if(fresh) { activeTorneo = fresh; renderPanelTorneo(); loadInscripciones(); }
-    else { document.getElementById('panel-torneo').style.display='none'; }
+  document.getElementById('loader-torneos').style.display = 'flex';
+  document.getElementById('torneos-grid').innerHTML = '';
+  const { data, error } = await sb.from('fifa_torneos').select('*').order('fecha', { ascending: false });
+  document.getElementById('loader-torneos').style.display = 'none';
+  if (error) return setMsg('torneos-grid', error.message, 'error');
+  renderTorneos(data || []);
+  if (activeTorneo) {
+    const fresh = (data || []).find(t => t.id === activeTorneo.id);
+    if (fresh) { activeTorneo = fresh; renderPanelTorneo(); loadJugadores(); }
+    else { document.getElementById('panel-torneo').style.display = 'none'; }
   } else {
-    document.getElementById('panel-torneo').style.display='none';
+    document.getElementById('panel-torneo').style.display = 'none';
   }
 }
 
 function renderTorneos(list) {
   const g = document.getElementById('torneos-grid');
-  if(!list.length) { g.innerHTML='<div style="color:var(--text2);font-size:13px">No hay torneos aún.</div>'; return; }
-  g.innerHTML = list.map(t=>`
-    <div class="torneo-card ${activeTorneo?.id===t.id?'selected':''}" onclick="selectTorneo(${t.id})">
+  if (!list.length) { g.innerHTML = '<div style="color:var(--text2);font-size:13px">No hay torneos aún. Creá el primero.</div>'; return; }
+  g.innerHTML = list.map(t => `
+    <div class="torneo-card ${activeTorneo?.id === t.id ? 'selected' : ''}" onclick="selectTorneo(${t.id})">
       <div class="torneo-name">${t.nombre}</div>
       <div class="torneo-meta">
         <span>📅 ${t.fecha}</span>
-        <span>👥 Máx ${t.max_jugadores}</span>
         <span>🎮 ${t.consolas} PS5</span>
       </div>
       <div style="margin-top:8px"><span class="badge ${t.estado}">${t.estado.replace('_',' ')}</span></div>
@@ -446,164 +409,154 @@ function renderTorneos(list) {
 }
 
 async function selectTorneo(id) {
-  const {data} = await sb.from('fifa_torneos').select('*').eq('id',id).single();
-  if(!data) return;
+  const { data } = await sb.from('fifa_torneos').select('*').eq('id', id).single();
+  if (!data) return;
   activeTorneo = data;
   updateNav();
-  renderPanelTorneo();
-  await loadInscripciones();
   document.getElementById('tv-title').textContent = '⚽ ' + data.nombre.toUpperCase();
+  renderPanelTorneo();
+  await loadJugadores();
+  if (data.estado === 'en_curso') await loadPartidos();
 }
 
 function renderPanelTorneo() {
   const t = activeTorneo;
-  document.getElementById('panel-torneo').style.display='';
+  document.getElementById('panel-torneo').style.display = '';
   document.getElementById('pt-nombre').textContent = t.nombre;
-  document.getElementById('pt-meta').textContent = `${t.fecha} · Máx ${t.max_jugadores} jugadores · ${t.consolas} PS5 · ${t.estado}`;
+  document.getElementById('pt-meta').textContent = t.fecha + ' · ' + t.consolas + ' PS5 · ' + t.estado.replace('_',' ');
+
   const actions = document.getElementById('pt-actions');
-  let html = `<button class="btn sm" onclick="openInscripcion()">🔗 Link inscripción</button>`;
-  if(isAdmin) {
-    if(t.estado==='inscripcion') html += `<button class="btn sm green" onclick="iniciarTorneo()">🚀 Iniciar torneo</button>`;
-    if(t.estado==='en_curso') html += `<button class="btn sm" onclick="showView('manage')">🎮 Partidos</button>`;
-  }
-  if(t.estado==='en_curso') {
+  let html = '';
+  if (t.estado === 'en_curso') {
+    html += `<button class="btn sm" onclick="showView('manage')">🎮 Partidos</button>`;
     html += `<button class="btn sm" onclick="showView('bracket')">🏆 Bracket</button>`;
     html += `<button class="btn sm" onclick="showView('display')">📺 TV</button>`;
   }
-  if(isAdmin) html += `<button class="btn sm danger" onclick="borrarTorneo(${t.id})">🗑 Borrar torneo</button>`;
+  html += `<button class="btn sm" onclick="copiarLinkPublico()">🔗 Link público</button>`;
+  html += `<button class="btn sm danger" onclick="borrarTorneo()">🗑 Borrar</button>`;
   actions.innerHTML = html;
-}
 
-function openInscripcion() {
-  alert(`Compartí este link con los jugadores:\n${location.href.split('?')[0]}?torneo=${activeTorneo.id}\n\nO pediles que vayan a la sección "Inscripción" del menú.`);
+  // Mostrar/ocultar sección jugadores
+  const cardJug = document.getElementById('card-jugadores');
+  cardJug.style.display = t.estado === 'en_curso' ? 'none' : '';
 }
 
 function showNuevoTorneo() {
   const c = document.getElementById('card-nuevo-torneo');
-  c.style.display = c.style.display==='none' ? '' : 'none';
-  const hoy = new Date().toISOString().split('T')[0];
-  document.getElementById('nt-fecha').value = hoy;
-}
-
-async function borrarTorneo(id) {
-  const nombre = activeTorneo?.nombre || 'este torneo';
-  const confirmado = confirm(`¿Seguro que querés borrar "${nombre}"?\n\nEsto eliminará el torneo, todas las inscripciones y todos los partidos. Esta acción no se puede deshacer.`);
-  if(!confirmado) return;
-  const confirmado2 = confirm(`Confirmación final: borrar "${nombre}" permanentemente.`);
-  if(!confirmado2) return;
-  // Borrar partidos e inscripciones primero (CASCADE debería hacerlo, pero por si acaso)
-  await sb.from('fifa_partidos').delete().eq('torneo_id', id);
-  await sb.from('fifa_inscripciones').delete().eq('torneo_id', id);
-  const {error} = await sb.from('fifa_torneos').delete().eq('id', id);
-  if(error) return alert('Error al borrar: ' + error.message);
-  if(activeTorneo?.id === id) {
-    activeTorneo = null;
-    rounds = [];
-    updateNav();
-    document.getElementById('panel-torneo').style.display = 'none';
-  }
-  await loadTorneos();
+  c.style.display = c.style.display === 'none' ? '' : 'none';
+  document.getElementById('nt-fecha').value = new Date().toISOString().split('T')[0];
 }
 
 async function crearTorneo() {
   const nombre   = document.getElementById('nt-nombre').value.trim();
   const fecha    = document.getElementById('nt-fecha').value;
-  const maxJug   = parseInt(document.getElementById('nt-max').value);
   const consolas = parseInt(document.getElementById('nt-consolas').value);
-  if(!nombre||!fecha) return setMsg('nt-msg','Completá nombre y fecha','error');
+  if (!nombre || !fecha) return setMsg('nt-msg', 'Completá nombre y fecha', 'error');
   const id = Date.now();
-  const {error} = await sb.from('fifa_torneos').insert({id, nombre, fecha, max_jugadores:maxJug, consolas, estado:'inscripcion', creado_por:currentUser.id});
-  if(error) return setMsg('nt-msg', error.message, 'error');
-  document.getElementById('card-nuevo-torneo').style.display='none';
+  const { error } = await sb.from('fifa_torneos').insert({ id, nombre, fecha, max_jugadores: 32, consolas, estado: 'inscripcion', creado_por: currentUser.id });
+  if (error) return setMsg('nt-msg', error.message, 'error');
+  document.getElementById('card-nuevo-torneo').style.display = 'none';
+  document.getElementById('nt-nombre').value = '';
   await loadTorneos();
   await selectTorneo(id);
 }
 
-// ===================== INSCRIPCIONES =====================
-async function loadInscripciones() {
-  if(!activeTorneo) return;
-  const {data} = await sb.from('fifa_inscripciones').select('*').eq('torneo_id', activeTorneo.id).order('created_at');
-  renderInscripciones(data||[]);
+async function borrarTorneo() {
+  const nombre = activeTorneo?.nombre || 'este torneo';
+  if (!confirm('¿Seguro que querés borrar "' + nombre + '"?\n\nSe eliminarán todos los partidos y jugadores. Esta acción no se puede deshacer.')) return;
+  if (!confirm('Confirmación final: borrar "' + nombre + '" permanentemente.')) return;
+  const id = activeTorneo.id;
+  await sb.from('fifa_partidos').delete().eq('torneo_id', id);
+  await sb.from('fifa_jugadores').delete().eq('torneo_id', id);
+  const { error } = await sb.from('fifa_torneos').delete().eq('id', id);
+  if (error) return alert('Error al borrar: ' + error.message);
+  activeTorneo = null; rounds = [];
+  updateNav();
+  document.getElementById('panel-torneo').style.display = 'none';
+  await loadTorneos();
 }
 
-function renderInscripciones(list) {
-  const el = document.getElementById('inscripciones-list');
-  const lbl = document.getElementById('insc-count-label');
-  const aprobados = list.filter(i=>i.estado==='aprobado').length;
-  lbl.textContent = `Inscripciones — ${aprobados}/${activeTorneo.max_jugadores} aprobados`;
-  if(!list.length) { el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin inscripciones aún.</div>'; return; }
-  el.innerHTML = `<div class="inscripciones-list">${list.map(i=>`
-    <div class="insc-row">
-      <div class="insc-avatar">${i.username[0].toUpperCase()}</div>
-      <div class="insc-info">
-        <div class="insc-name">${i.username}</div>
-        <div class="insc-email">${i.email}</div>
+function copiarLinkPublico() {
+  const url = location.href.split('?')[0] + '?torneo=' + activeTorneo.id;
+  navigator.clipboard.writeText(url).then(() => alert('Link copiado:\n' + url)).catch(() => prompt('Copiá este link:', url));
+}
+
+// ===================== JUGADORES =====================
+async function loadJugadores() {
+  if (!activeTorneo) return;
+  const { data } = await sb.from('fifa_jugadores').select('*').eq('torneo_id', activeTorneo.id).order('created_at');
+  renderJugadores(data || []);
+}
+
+function renderJugadores(list) {
+  const el = document.getElementById('jugadores-list');
+  const lbl = document.getElementById('jugadores-count-label');
+  lbl.textContent = 'Jugadores (' + list.length + ')';
+
+  if (!list.length) {
+    el.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:8px 0">Sin jugadores aún. Agregá al menos 2 para iniciar.</div>';
+  } else {
+    el.innerHTML = '<div class="jugadores-grid">' + list.map((j, i) => `
+      <div class="jugador-tag">
+        <div class="jugador-avatar">${j.nombre[0].toUpperCase()}</div>
+        <span class="jugador-nombre">${j.nombre}</span>
+        <span class="jugador-num">#${i + 1}</span>
+        <button class="btn sm danger" style="padding:3px 8px;font-size:11px" onclick="borrarJugador(${j.id})">✕</button>
       </div>
-      <span class="badge ${i.estado}">${i.estado}</span>
-      ${isAdmin && i.estado==='pendiente' ? `
-        <button class="btn sm green" onclick="aprobarInscripcion(${i.id})">✓</button>
-        <button class="btn sm danger" onclick="rechazarInscripcion(${i.id})">✗</button>
-      ` : ''}
-      ${isAdmin && i.estado==='aprobado' ? `<button class="btn sm danger" onclick="rechazarInscripcion(${i.id})">✗</button>` : ''}
-    </div>
-  `).join('')}</div>`;
-}
-
-async function aprobarInscripcion(id) {
-  await sb.from('fifa_inscripciones').update({estado:'aprobado'}).eq('id',id);
-  await loadInscripciones();
-}
-
-async function rechazarInscripcion(id) {
-  await sb.from('fifa_inscripciones').update({estado:'rechazado'}).eq('id',id);
-  await loadInscripciones();
-}
-
-// Inscripción pública (el jugador llena el form)
-async function loadInscripcionPublica(torneoId) {
-  const {data} = await sb.from('fifa_torneos').select('*').eq('id', torneoId).single();
-  if(!data) return;
-  document.getElementById('insc-torneo-nombre').textContent = data.nombre;
-  document.getElementById('insc-torneo-fecha').textContent = '📅 ' + data.fecha;
-  activeTorneo = data;
-  // Pre-fill username from auth
-  if(currentUser?.user_metadata?.username) document.getElementById('insc-username').value = currentUser.user_metadata.username;
-  if(currentUser?.email) document.getElementById('insc-email').value = currentUser.email;
-}
-
-async function doInscripcion() {
-  const username = document.getElementById('insc-username').value.trim();
-  const email    = document.getElementById('insc-email').value.trim();
-  if(!username||!email) return setMsg('insc-msg','Completá todos los campos','error');
-  if(!activeTorneo) return setMsg('insc-msg','No hay torneo activo','error');
-  const id = Date.now();
-  const {error} = await sb.from('fifa_inscripciones').insert({
-    id, torneo_id: activeTorneo.id,
-    user_id: currentUser?.id||null,
-    username, email, estado:'pendiente'
-  });
-  if(error) {
-    if(error.code==='23505') return setMsg('insc-msg','Ya estás inscrito en este torneo.','warn');
-    return setMsg('insc-msg', error.message, 'error');
+    `).join('') + '</div>';
   }
-  document.getElementById('insc-form').innerHTML=`<div class="alert info">✓ ¡Inscripción enviada! El administrador confirmará tu lugar.</div>`;
+
+  const wrap = document.getElementById('btn-iniciar-wrap');
+  if (list.length >= 2 && activeTorneo.estado === 'inscripcion') {
+    wrap.innerHTML = `<button class="btn gold" onclick="iniciarTorneo()">🚀 Iniciar torneo con ${list.length} jugadores</button>`;
+  } else if (list.length < 2) {
+    wrap.innerHTML = '<span style="font-size:12px;color:var(--text2)">Necesitás al menos 2 jugadores para iniciar.</span>';
+  } else {
+    wrap.innerHTML = '';
+  }
+}
+
+function mostrarFormJugador() {
+  document.getElementById('form-jugador').style.display = '';
+  document.getElementById('inp-jugador').focus();
+}
+
+function ocultarFormJugador() {
+  document.getElementById('form-jugador').style.display = 'none';
+  document.getElementById('inp-jugador').value = '';
+  setMsg('jugador-msg', '');
+}
+
+async function agregarJugador() {
+  const nombre = document.getElementById('inp-jugador').value.trim();
+  if (!nombre) return setMsg('jugador-msg', 'Ingresá un nombre', 'error');
+  const { error } = await sb.from('fifa_jugadores').insert({ id: Date.now(), torneo_id: activeTorneo.id, nombre });
+  if (error) {
+    if (error.code === '23505') return setMsg('jugador-msg', 'Ya existe un jugador con ese nombre', 'warn');
+    return setMsg('jugador-msg', error.message, 'error');
+  }
+  document.getElementById('inp-jugador').value = '';
+  document.getElementById('inp-jugador').focus();
+  setMsg('jugador-msg', '');
+  await loadJugadores();
+}
+
+async function borrarJugador(id) {
+  await sb.from('fifa_jugadores').delete().eq('id', id);
+  await loadJugadores();
 }
 
 // ===================== INICIAR TORNEO =====================
 async function iniciarTorneo() {
-  if(!activeTorneo) return;
-  const {data:inscritos} = await sb.from('fifa_inscripciones')
-    .select('username').eq('torneo_id', activeTorneo.id).eq('estado','aprobado');
-  if(!inscritos||inscritos.length<2) return alert('Necesitás al menos 2 jugadores aprobados.');
-  const players = inscritos.map(i=>i.username);
+  const { data: jugadores } = await sb.from('fifa_jugadores').select('nombre').eq('torneo_id', activeTorneo.id).order('created_at');
+  if (!jugadores || jugadores.length < 2) return alert('Necesitás al menos 2 jugadores.');
+  const players = jugadores.map(j => j.nombre);
   buildRounds(players, activeTorneo.consolas);
   await savePartidos();
-  await sb.from('fifa_torneos').update({estado:'en_curso'}).eq('id', activeTorneo.id);
-  activeTorneo.estado='en_curso';
+  await sb.from('fifa_torneos').update({ estado: 'en_curso' }).eq('id', activeTorneo.id);
+  activeTorneo.estado = 'en_curso';
   renderPanelTorneo();
   updateNav();
-  renderManage();
-  renderBracket();
   showView('manage');
 }
 
@@ -612,23 +565,23 @@ function buildRounds(players, consolasCount) {
   const pow2 = nextPow2(players.length);
   const seeded = seedOrder(pow2);
   const padded = [...players];
-  while(padded.length<pow2) padded.push('BYE');
+  while (padded.length < pow2) padded.push('BYE');
   rounds = [];
   const r0 = [];
-  for(let i=0;i<pow2/2;i++) {
-    const p1=padded[seeded[i*2]], p2=padded[seeded[i*2+1]];
-    const m={id:Date.now()+i,torneo_id:activeTorneo.id,ronda:0,posicion:i,p1,p2,score1:null,score2:null,ganador:null,consola:null,estado:'pendiente'};
-    if(p2==='BYE'){m.ganador=p1;m.estado='completado';}
-    if(p1==='BYE'){m.ganador=p2;m.estado='completado';}
+  for (let i = 0; i < pow2 / 2; i++) {
+    const p1 = padded[seeded[i * 2]], p2 = padded[seeded[i * 2 + 1]];
+    const m = { id: Date.now() + i, torneo_id: activeTorneo.id, ronda: 0, posicion: i, p1, p2, score1: null, score2: null, ganador: null, consola: null, estado: 'pendiente' };
+    if (p2 === 'BYE') { m.ganador = p1; m.estado = 'completado'; }
+    if (p1 === 'BYE') { m.ganador = p2; m.estado = 'completado'; }
     r0.push(m);
   }
   rounds.push(r0);
   const totalR = Math.log2(pow2);
-  for(let r=1;r<totalR;r++) {
-    const prev=rounds[r-1], rnd=[];
-    for(let i=0;i<prev.length/2;i++) {
-      const w1=prev[i*2].ganador||'TBD', w2=prev[i*2+1].ganador||'TBD';
-      rnd.push({id:Date.now()+r*100+i,torneo_id:activeTorneo.id,ronda:r,posicion:i,p1:w1,p2:w2,score1:null,score2:null,ganador:null,consola:null,estado:'pendiente'});
+  for (let r = 1; r < totalR; r++) {
+    const prev = rounds[r - 1], rnd = [];
+    for (let i = 0; i < prev.length / 2; i++) {
+      const w1 = prev[i * 2].ganador || 'TBD', w2 = prev[i * 2 + 1].ganador || 'TBD';
+      rnd.push({ id: Date.now() + r * 1000 + i, torneo_id: activeTorneo.id, ronda: r, posicion: i, p1: w1, p2: w2, score1: null, score2: null, ganador: null, consola: null, estado: 'pendiente' });
     }
     rounds.push(rnd);
   }
@@ -636,312 +589,320 @@ function buildRounds(players, consolasCount) {
 }
 
 function assignConsoles(c) {
-  let slot=1;
-  rounds.flat().forEach(m=>{ if(m.estado!=='completado'){m.consola=slot;slot=slot%c+1;} });
+  let slot = 1;
+  rounds.flat().forEach(m => { if (m.estado !== 'completado') { m.consola = slot; slot = slot % c + 1; } });
 }
 
 async function savePartidos() {
-  const all = rounds.flat();
   await sb.from('fifa_partidos').delete().eq('torneo_id', activeTorneo.id);
-  const rows = all.map(m=>({id:m.id,torneo_id:m.torneo_id,ronda:m.ronda,posicion:m.posicion,p1:m.p1,p2:m.p2,score1:m.score1,score2:m.score2,ganador:m.ganador,consola:m.consola,estado:m.estado}));
+  const rows = rounds.flat().map(m => ({ id: m.id, torneo_id: m.torneo_id, ronda: m.ronda, posicion: m.posicion, p1: m.p1, p2: m.p2, score1: m.score1, score2: m.score2, ganador: m.ganador, consola: m.consola, estado: m.estado }));
   await sb.from('fifa_partidos').insert(rows);
 }
 
+async function loadPartidos() {
+  if (!activeTorneo) return;
+  const { data, error } = await sb.from('fifa_partidos').select('*').eq('torneo_id', activeTorneo.id).order('ronda').order('posicion');
+  if (error) { console.error('loadPartidos:', error.message); return; }
+  if (!data || !data.length) return;
+  const maxRonda = Math.max(...data.map(m => m.ronda));
+  rounds = [];
+  for (let r = 0; r <= maxRonda; r++) rounds.push(data.filter(m => m.ronda === r));
+  renderManage(); renderBracket(); renderDisplay(); renderStats();
+  if (currentView === 'manage') setTimeout(() => injectRefreshBtn('manage'), 60);
+  if (currentView === 'bracket') setTimeout(() => injectRefreshBtn('bracket'), 60);
+  const ind = document.getElementById('tv-last-refresh');
+  if (ind) ind.textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
 
-
-function nextPow2(n){let p=1;while(p<n)p*=2;return p;}
-function seedOrder(n){let s=[0,1];while(s.length<n){const ns=[];const len=s.length*2;for(let i=0;i<s.length;i++){ns.push(s[i]);ns.push(len-1-s[i]);}s=ns;}return s;}
-function roundName(r){const t=rounds.length;if(r===t-1)return'Final';if(r===t-2)return'Semifinal';if(r===t-3)return'Cuartos de Final';if(r===t-4)return'Octavos de Final';return`Ronda ${r+1}`;}
-function getMatch(id){return rounds.flat().find(m=>m.id===id||m.id==id);}
+function nextPow2(n) { let p = 1; while (p < n) p *= 2; return p; }
+function seedOrder(n) { let s = [0, 1]; while (s.length < n) { const ns = [], len = s.length * 2; for (let i = 0; i < s.length; i++) { ns.push(s[i]); ns.push(len - 1 - s[i]); } s = ns; } return s; }
+function roundName(r) { const t = rounds.length; if (r === t - 1) return 'Final'; if (r === t - 2) return 'Semifinal'; if (r === t - 3) return 'Cuartos de Final'; if (r === t - 4) return 'Octavos de Final'; return 'Ronda ' + (r + 1); }
+function getMatch(id) { return rounds.flat().find(m => m.id == id); }
 
 // ===================== MATCH MANAGEMENT =====================
 function setWinner(matchId, player) {
-  const m=getMatch(matchId); if(!m||m.estado==='completado')return;
-  m.ganador = m.ganador===player ? null : player;
+  const m = getMatch(matchId);
+  if (!m || m.estado === 'completado') return;
+  m.ganador = m.ganador === player ? null : player;
   renderManage();
 }
 
 async function startMatch(matchId) {
-  const m=getMatch(matchId); if(!m)return;
-  m.estado='jugando';
-  await sb.from('fifa_partidos').update({estado:'jugando'}).eq('id',matchId);
-  renderAll();
+  const m = getMatch(matchId);
+  if (!m) return;
+  m.estado = 'jugando';
+  await sb.from('fifa_partidos').update({ estado: 'jugando' }).eq('id', matchId);
+  renderManage(); renderBracket(); renderDisplay();
 }
 
 async function confirmWinner(matchId) {
-  const m=getMatch(matchId); if(!m||!m.ganador)return;
-  const s1=parseInt(document.getElementById(`s1-${matchId}`)?.value);
-  const s2=parseInt(document.getElementById(`s2-${matchId}`)?.value);
-  m.score1=isNaN(s1)?null:s1; m.score2=isNaN(s2)?null:s2;
-  m.estado='completado';
-  await sb.from('fifa_partidos').update({ganador:m.ganador,score1:m.score1,score2:m.score2,estado:'completado'}).eq('id',matchId);
+  const m = getMatch(matchId);
+  if (!m || !m.ganador) return;
+  const s1 = parseInt(document.getElementById('s1-' + matchId)?.value);
+  const s2 = parseInt(document.getElementById('s2-' + matchId)?.value);
+  m.score1 = isNaN(s1) ? null : s1;
+  m.score2 = isNaN(s2) ? null : s2;
+  m.estado = 'completado';
+  await sb.from('fifa_partidos').update({ ganador: m.ganador, score1: m.score1, score2: m.score2, estado: 'completado' }).eq('id', matchId);
   propagate();
   await updateNextRoundInDB(m.ronda);
-  renderAll();
+  renderManage(); renderBracket(); renderDisplay(); renderStats();
 }
 
 async function resetMatch(matchId) {
-  const m=getMatch(matchId); if(!m)return;
-  m.ganador=null;m.score1=null;m.score2=null;m.estado='pendiente';
-  clearDownstream(m.ronda,m.posicion);
+  const m = getMatch(matchId);
+  if (!m) return;
+  m.ganador = null; m.score1 = null; m.score2 = null; m.estado = 'pendiente';
+  clearDownstream(m.ronda, m.posicion);
   propagate();
   await savePartidos();
-  renderAll();
+  renderManage(); renderBracket(); renderDisplay(); renderStats();
 }
 
 function propagate() {
-  for(let r=1;r<rounds.length;r++){
-    const prev=rounds[r-1],cur=rounds[r];
-    for(let i=0;i<cur.length;i++){
-      const w1=prev[i*2]?.ganador||'TBD', w2=prev[i*2+1]?.ganador||'TBD';
-      if(cur[i].estado!=='completado'){cur[i].p1=w1;cur[i].p2=w2;cur[i].ganador=null;}
+  for (let r = 1; r < rounds.length; r++) {
+    const prev = rounds[r - 1], cur = rounds[r];
+    for (let i = 0; i < cur.length; i++) {
+      const w1 = prev[i * 2]?.ganador || 'TBD', w2 = prev[i * 2 + 1]?.ganador || 'TBD';
+      if (cur[i].estado !== 'completado') { cur[i].p1 = w1; cur[i].p2 = w2; cur[i].ganador = null; }
     }
   }
 }
 
 async function updateNextRoundInDB(ronda) {
-  if(ronda+1>=rounds.length) return;
-  const next=rounds[ronda+1];
-  for(const m of next) {
-    await sb.from('fifa_partidos').update({p1:m.p1,p2:m.p2,ganador:null,estado:'pendiente'}).eq('id',m.id);
+  if (ronda + 1 >= rounds.length) return;
+  for (const m of rounds[ronda + 1]) {
+    await sb.from('fifa_partidos').update({ p1: m.p1, p2: m.p2, ganador: null, estado: 'pendiente' }).eq('id', m.id);
   }
 }
 
-function clearDownstream(ronda,pos) {
-  for(let r=ronda+1;r<rounds.length;r++){
-    const mi=Math.floor(pos/Math.pow(2,r-ronda));
-    const m2=rounds[r]?.[mi];
-    if(m2){m2.ganador=null;m2.score1=null;m2.score2=null;m2.estado='pendiente';m2.p1='TBD';m2.p2='TBD';}
+function clearDownstream(ronda, pos) {
+  for (let r = ronda + 1; r < rounds.length; r++) {
+    const mi = Math.floor(pos / Math.pow(2, r - ronda));
+    const m2 = rounds[r]?.[mi];
+    if (m2) { m2.ganador = null; m2.score1 = null; m2.score2 = null; m2.estado = 'pendiente'; m2.p1 = 'TBD'; m2.p2 = 'TBD'; }
   }
 }
-
-function renderAll(){renderManage();renderBracket();renderDisplay();renderStats();}
 
 // ===================== RENDER MANAGE =====================
 function renderManage() {
-  const b=document.getElementById('manage-body'); if(!b)return;
-  if(!rounds.length){b.innerHTML='<div class="loader"><div class="spinner"></div>Cargando partidos...</div>';loadPartidos();return;}
-  let html='';
-  rounds.forEach((round,ri)=>{
-    const visible=round.filter(m=>m.p1!=='BYE'&&m.p2!=='BYE');
-    if(!visible.length)return;
-    html+=`<div class="section-title" style="margin-top:18px">${roundName(ri)}</div><div class="match-queue">`;
-    visible.forEach(m=>{
-      const playing=m.estado==='jugando',done=m.estado==='completado',tbd=m.p1==='TBD'||m.p2==='TBD';
-      html+=`<div class="match-card ${playing?'playing':''} ${done?'done':''}">`;
-      html+=`<div class="match-meta"><span class="round-badge">${roundName(ri)}</span>`;
-      if(m.consola)html+=`<span class="console-badge">PS5 #${m.consola}</span>`;
-      if(done)html+=`<span style="font-size:11px;color:#4cde8c">✓ Completado</span>`;
-      if(playing)html+=`<span style="font-size:11px;color:var(--gold)">● En juego</span>`;
-      html+=`</div>`;
-      if(tbd){html+=`<div class="tbd-notice">Esperando ronda anterior...</div>`;}
-      else{
-        html+=`<div class="match-players">
-          <div class="mp ${m.ganador===m.p1?'winner':''} ${m.ganador&&m.ganador!==m.p1?'loser':''}" onclick="setWinner(${m.id},'${m.p1}')">
-            <div style="font-size:10px;color:var(--text2);margin-bottom:2px">Jugador 1</div>${m.p1}
-          </div>
-          <div class="vs-label">VS</div>
-          <div class="mp ${m.ganador===m.p2?'winner':''} ${m.ganador&&m.ganador!==m.p2?'loser':''}" onclick="setWinner(${m.id},'${m.p2}')">
-            <div style="font-size:10px;color:var(--text2);margin-bottom:2px">Jugador 2</div>${m.p2}
-          </div>
-        </div>`;
-        if(!done)html+=`<div class="score-row"><span style="font-size:12px;color:var(--text2)">Marcador:</span>
-          <input type="number" min="0" max="20" id="s1-${m.id}" placeholder="0" style="width:52px" value="${m.score1??''}">
-          <span class="score-sep">-</span>
-          <input type="number" min="0" max="20" id="s2-${m.id}" placeholder="0" style="width:52px" value="${m.score2??''}">
-        </div>`;
-        else if(m.score1!==null)html+=`<div style="font-size:13px;color:var(--text2);margin-bottom:8px">Marcador: <strong style="color:var(--gold)">${m.score1} - ${m.score2}</strong></div>`;
-        html+=`<div class="btn-row">`;
-        if(!done&&!playing)html+=`<button class="btn sm green" onclick="startMatch(${m.id})">▶ Iniciar</button>`;
-        if(!done&&m.ganador)html+=`<button class="btn sm gold" onclick="confirmWinner(${m.id})">✓ Confirmar ganador</button>`;
-        if(done)html+=`<button class="btn sm danger" onclick="resetMatch(${m.id})">↩ Revertir</button>`;
-        html+=`</div>`;
+  const b = document.getElementById('manage-body');
+  if (!b) return;
+  if (!rounds.length) { b.innerHTML = '<div class="loader"><div class="spinner"></div>Cargando partidos...</div>'; loadPartidos(); return; }
+  let html = '';
+  rounds.forEach((round, ri) => {
+    const visible = round.filter(m => m.p1 !== 'BYE' && m.p2 !== 'BYE');
+    if (!visible.length) return;
+    html += '<div class="section-title" style="margin-top:18px">' + roundName(ri) + '</div><div class="match-queue">';
+    visible.forEach(m => {
+      const playing = m.estado === 'jugando', done = m.estado === 'completado', tbd = m.p1 === 'TBD' || m.p2 === 'TBD';
+      html += '<div class="match-card ' + (playing ? 'playing' : '') + ' ' + (done ? 'done' : '') + '">';
+      html += '<div class="match-meta"><span class="round-badge">' + roundName(ri) + '</span>';
+      if (m.consola) html += '<span class="console-badge">PS5 #' + m.consola + '</span>';
+      if (done) html += '<span style="font-size:11px;color:#4cde8c">✓ Completado</span>';
+      if (playing) html += '<span style="font-size:11px;color:var(--gold)">● En juego</span>';
+      html += '</div>';
+      if (tbd) {
+        html += '<div class="tbd-notice">Esperando ronda anterior...</div>';
+      } else {
+        html += '<div class="match-players">';
+        html += '<div class="mp ' + (m.ganador === m.p1 ? 'winner' : '') + ' ' + (m.ganador && m.ganador !== m.p1 ? 'loser' : '') + '" onclick="setWinner(' + m.id + ',\'' + m.p1 + '\')"><div style="font-size:10px;color:var(--text2);margin-bottom:2px">Jugador 1</div>' + m.p1 + '</div>';
+        html += '<div class="vs-label">VS</div>';
+        html += '<div class="mp ' + (m.ganador === m.p2 ? 'winner' : '') + ' ' + (m.ganador && m.ganador !== m.p2 ? 'loser' : '') + '" onclick="setWinner(' + m.id + ',\'' + m.p2 + '\')"><div style="font-size:10px;color:var(--text2);margin-bottom:2px">Jugador 2</div>' + m.p2 + '</div>';
+        html += '</div>';
+        if (!done) html += '<div class="score-row"><span style="font-size:12px;color:var(--text2)">Marcador:</span><input type="number" min="0" max="20" id="s1-' + m.id + '" placeholder="0" style="width:52px" value="' + (m.score1 ?? '') + '"><span class="score-sep">-</span><input type="number" min="0" max="20" id="s2-' + m.id + '" placeholder="0" style="width:52px" value="' + (m.score2 ?? '') + '"></div>';
+        else if (m.score1 !== null) html += '<div style="font-size:13px;color:var(--text2);margin-bottom:8px">Marcador: <strong style="color:var(--gold)">' + m.score1 + ' - ' + m.score2 + '</strong></div>';
+        html += '<div class="btn-row">';
+        if (!done && !playing) html += '<button class="btn sm green" onclick="startMatch(' + m.id + ')">▶ Iniciar</button>';
+        if (!done && m.ganador) html += '<button class="btn sm gold" onclick="confirmWinner(' + m.id + ')">✓ Confirmar ganador</button>';
+        if (done) html += '<button class="btn sm danger" onclick="resetMatch(' + m.id + ')">↩ Revertir</button>';
+        html += '</div>';
       }
-      html+=`</div>`;
+      html += '</div>';
     });
-    html+=`</div>`;
+    html += '</div>';
   });
-  b.innerHTML=html;
+  b.innerHTML = html;
 }
 
-function renderStats(){
-  const g=document.getElementById('stats-grid');if(!g)return;
-  const all=rounds.flat().filter(m=>m.p1!=='BYE'&&m.p2!=='BYE');
-  const done=all.filter(m=>m.estado==='completado').length;
-  const playing=all.filter(m=>m.estado==='jugando').length;
-  g.innerHTML=`
+function renderStats() {
+  const g = document.getElementById('stats-grid');
+  if (!g) return;
+  const all = rounds.flat().filter(m => m.p1 !== 'BYE' && m.p2 !== 'BYE');
+  const done = all.filter(m => m.estado === 'completado').length;
+  const playing = all.filter(m => m.estado === 'jugando').length;
+  g.innerHTML = `
     <div class="stat-card"><div class="stat-val">${all.length}</div><div class="stat-label">Total</div></div>
     <div class="stat-card"><div class="stat-val" style="color:#4cde8c">${done}</div><div class="stat-label">Completados</div></div>
     <div class="stat-card"><div class="stat-val" style="color:var(--gold)">${playing}</div><div class="stat-label">En juego</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:var(--text2)">${all.length-done-playing}</div><div class="stat-label">Pendientes</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--text2)">${all.length - done - playing}</div><div class="stat-label">Pendientes</div></div>
   `;
 }
 
 // ===================== RENDER BRACKET =====================
-function renderBracket(){
-  const c=document.getElementById('bracket-container');if(!c)return;
-  if(!rounds.length){c.innerHTML='';return;}
-  let html=`<div class="bracket-flex">`;
-  rounds.forEach((round,ri)=>{
-    html+=`<div class="b-round"><div class="b-round-label">${roundName(ri)}</div><div class="b-col">`;
-    round.forEach(m=>{
-      if(m.p1==='BYE'||m.p2==='BYE')return;
-      html+=`<div class="b-match ${m.estado==='jugando'?'playing':''}">`;
-      [['p1','score1'],['p2','score2']].forEach(([pk,sk])=>{
-        const p=m[pk],sc=m[sk],isW=m.ganador===p&&p!=='TBD',isL=m.ganador&&m.ganador!==p&&p!=='TBD',isTBD=p==='TBD';
-        html+=`<div class="b-player ${isW?'winner':''} ${isL?'loser':''} ${isTBD?'tbd':''}">
-          <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}</span>
-          ${sc!==null&&sc!==undefined?`<span class="b-score">${sc}</span>`:''}
-          ${m.estado==='jugando'&&m.consola?`<span class="b-console-tag">PS5#${m.consola}</span>`:''}
-        </div>`;
+function renderBracket() {
+  const c = document.getElementById('bracket-container');
+  if (!c || !rounds.length) return;
+  let html = '<div class="bracket-flex">';
+  rounds.forEach((round, ri) => {
+    html += '<div class="b-round"><div class="b-round-label">' + roundName(ri) + '</div><div class="b-col">';
+    round.forEach(m => {
+      if (m.p1 === 'BYE' || m.p2 === 'BYE') return;
+      html += '<div class="b-match ' + (m.estado === 'jugando' ? 'playing' : '') + '">';
+      [['p1','score1'],['p2','score2']].forEach(([pk, sk]) => {
+        const p = m[pk], sc = m[sk], isW = m.ganador === p && p !== 'TBD', isL = m.ganador && m.ganador !== p && p !== 'TBD', isTBD = p === 'TBD';
+        html += '<div class="b-player ' + (isW ? 'winner' : '') + ' ' + (isL ? 'loser' : '') + ' ' + (isTBD ? 'tbd' : '') + '"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + p + '</span>';
+        if (sc !== null && sc !== undefined) html += '<span class="b-score">' + sc + '</span>';
+        if (m.estado === 'jugando' && m.consola) html += '<span class="b-console-tag">PS5#' + m.consola + '</span>';
+        html += '</div>';
       });
-      html+=`</div>`;
+      html += '</div>';
     });
-    html+=`</div></div>`;
+    html += '</div></div>';
   });
-  html+=`</div>`;
-  c.innerHTML=html;
+  html += '</div>';
+  c.innerHTML = html;
 }
 
 // ===================== TV DISPLAY =====================
-function renderDisplay(){
-  const b=document.getElementById('tv-body');if(!b)return;
-  if(!rounds.length){
-    b.innerHTML='<div style="text-align:center;padding:60px;color:rgba(255,255,255,.3);font-size:16px">Iniciá el torneo primero.</div>';
+function renderDisplay() {
+  const b = document.getElementById('tv-body');
+  if (!b) return;
+  if (!rounds.length) { b.innerHTML = '<div style="text-align:center;padding:60px;color:rgba(255,255,255,.3);font-size:16px">Iniciá el torneo primero.</div>'; return; }
+  const finalMatch = rounds[rounds.length - 1]?.[0];
+  if (finalMatch?.ganador && finalMatch.ganador !== 'TBD' && finalMatch.ganador !== 'BYE') {
+    b.innerHTML = '<div class="tv-champion"><div class="tv-trophy">🏆</div><div class="tv-ch-label">CAMPEÓN DEL TORNEO</div><div class="tv-ch-name">' + finalMatch.ganador + '</div></div>';
     return;
   }
-  const finalMatch=rounds[rounds.length-1]?.[0];
-  if(finalMatch?.ganador&&finalMatch.ganador!=='TBD'&&finalMatch.ganador!=='BYE'){
-    b.innerHTML=`<div class="tv-champion"><div class="tv-trophy">🏆</div><div class="tv-ch-label">CAMPEÓN DEL TORNEO</div><div class="tv-ch-name">${finalMatch.ganador}</div></div>`;
-    return;
+  const consolas = activeTorneo?.consolas || 2;
+  const playing = rounds.flat().filter(m => m.estado === 'jugando');
+  const nextUp = rounds.flat().filter(m => m.estado === 'pendiente' && m.p1 !== 'TBD' && m.p2 !== 'TBD' && m.p1 !== 'BYE' && m.p2 !== 'BYE').slice(0, 5);
+  let html = '<div class="tv-body"><div>';
+  html += '<div class="tv-sec">Consolas</div><div class="tv-consoles">';
+  for (let ci = 1; ci <= consolas; ci++) {
+    const m = playing.find(m => m.consola === ci);
+    html += '<div class="tv-con-card"><div class="tv-con-title">🎮 PS5 #' + ci + '</div>';
+    if (m) {
+      html += '<div class="tv-con-match"><div style="flex:1;text-align:center"><div class="tv-pname">' + m.p1 + '</div><div class="tv-pscore">' + (m.score1 ?? '-') + '</div></div><div class="tv-vs">VS</div><div style="flex:1;text-align:center"><div class="tv-pname">' + m.p2 + '</div><div class="tv-pscore">' + (m.score2 ?? '-') + '</div></div></div><div class="tv-round-tag">' + roundName(m.ronda) + '</div>';
+    } else html += '<div class="tv-empty">Sin partido activo</div>';
+    html += '</div>';
   }
-  const consolas=activeTorneo?.consolas||2;
-  const playing=rounds.flat().filter(m=>m.estado==='jugando');
-  const nextUp=rounds.flat().filter(m=>m.estado==='pendiente'&&m.p1!=='TBD'&&m.p2!=='TBD'&&m.p1!=='BYE'&&m.p2!=='BYE').slice(0,5);
-  let html=`<div class="tv-body"><div>`;
-  html+=`<div class="tv-sec">Consolas</div><div class="tv-consoles">`;
-  for(let ci=1;ci<=consolas;ci++){
-    const m=playing.find(m=>m.consola===ci);
-    html+=`<div class="tv-con-card"><div class="tv-con-title">🎮 PS5 #${ci}</div>`;
-    if(m){
-      html+=`<div class="tv-con-match">
-        <div style="flex:1;text-align:center"><div class="tv-pname">${m.p1}</div><div class="tv-pscore">${m.score1??'-'}</div></div>
-        <div class="tv-vs">VS</div>
-        <div style="flex:1;text-align:center"><div class="tv-pname">${m.p2}</div><div class="tv-pscore">${m.score2??'-'}</div></div>
-      </div><div class="tv-round-tag">${roundName(m.ronda)}</div>`;
-    }else html+=`<div class="tv-empty">Sin partido activo</div>`;
-    html+=`</div>`;
-  }
-  html+=`</div>`;
-  html+=`<div class="tv-sec">Bracket</div>`;
-  rounds.forEach((round,ri)=>{
-    html+=`<div class="tv-bm-round"><div class="tv-bm-label">${roundName(ri)}</div><div class="tv-bm-matches">`;
-    round.forEach(m=>{
-      if(m.p1==='BYE'||m.p2==='BYE')return;
-      html+=`<div class="tv-bm-match ${m.estado==='jugando'?'act':''}">`;
-      [['p1','score1'],['p2','score2']].forEach(([pk,sk])=>{
-        const p=m[pk],isW=m.ganador===p&&p!=='TBD',isL=m.ganador&&m.ganador!==p&&p!=='TBD';
-        html+=`<div class="tv-bm-p ${isW?'w':''} ${isL?'l':''}">${p==='TBD'?'?':p}${m[sk]!==null&&m[sk]!==undefined?` (${m[sk]})`:''}</div>`;
+  html += '</div>';
+  html += '<div class="tv-sec">Bracket</div>';
+  rounds.forEach((round, ri) => {
+    html += '<div class="tv-bm-round"><div class="tv-bm-label">' + roundName(ri) + '</div><div class="tv-bm-matches">';
+    round.forEach(m => {
+      if (m.p1 === 'BYE' || m.p2 === 'BYE') return;
+      html += '<div class="tv-bm-match ' + (m.estado === 'jugando' ? 'act' : '') + '">';
+      [['p1','score1'],['p2','score2']].forEach(([pk, sk]) => {
+        const p = m[pk], isW = m.ganador === p && p !== 'TBD', isL = m.ganador && m.ganador !== p && p !== 'TBD';
+        html += '<div class="tv-bm-p ' + (isW ? 'w' : '') + ' ' + (isL ? 'l' : '') + '">' + (p === 'TBD' ? '?' : p) + (m[sk] !== null && m[sk] !== undefined ? ' (' + m[sk] + ')' : '') + '</div>';
       });
-      html+=`</div>`;
+      html += '</div>';
     });
-    html+=`</div></div>`;
+    html += '</div></div>';
   });
-  html+=`</div><div>`;
-  html+=`<div class="tv-sec">Próximos</div>`;
-  if(nextUp.length){
-    html+=`<div class="tv-queue">`;
-    nextUp.forEach((m,i)=>{
-      html+=`<div class="tv-qi"><div class="tv-qnum">${i+1}</div>
-        <div><div class="tv-qnames">${m.p1} <span style="color:var(--text2)">vs</span> ${m.p2}</div>
-        <div class="tv-qround">${roundName(m.ronda)} · PS5 #${m.consola||'?'}</div></div></div>`;
+  html += '</div><div>';
+  html += '<div class="tv-sec">Próximos</div>';
+  if (nextUp.length) {
+    html += '<div class="tv-queue">';
+    nextUp.forEach((m, i) => {
+      html += '<div class="tv-qi"><div class="tv-qnum">' + (i + 1) + '</div><div><div class="tv-qnames">' + m.p1 + ' <span style="color:var(--text2)">vs</span> ' + m.p2 + '</div><div class="tv-qround">' + roundName(m.ronda) + ' · PS5 #' + (m.consola || '?') + '</div></div></div>';
     });
-    html+=`</div>`;
-  }else html+=`<div style="color:var(--text2);font-size:13px;font-style:italic">Sin partidos pendientes.</div>`;
-  html+=`</div></div>`;
-  b.innerHTML=html;
+    html += '</div>';
+  } else html += '<div style="color:var(--text2);font-size:13px;font-style:italic">Sin partidos pendientes.</div>';
+  html += '</div></div>';
+  b.innerHTML = html;
+}
+
+// ===================== VISTA PÚBLICA (sin login) =====================
+async function loadTorneoPublico(torneoId) {
+  const { data: t } = await sb.from('fifa_torneos').select('*').eq('id', torneoId).single();
+  if (!t) { showView('auth'); return; }
+  activeTorneo = t;
+  document.getElementById('tv-title').textContent = '⚽ ' + t.nombre.toUpperCase();
+  await loadPartidos();
+  showView('public');
+  startAutoRefresh();
+}
+
+function pubTab(tab) {
+  document.getElementById('pub-bracket').style.display = tab === 'bracket' ? '' : 'none';
+  document.getElementById('pub-tv').style.display = tab === 'tv' ? '' : 'none';
+  document.getElementById('pub-tab-bracket').classList.toggle('active', tab === 'bracket');
+  document.getElementById('pub-tab-tv').classList.toggle('active', tab === 'tv');
+  if (tab === 'tv') {
+    const b = document.getElementById('pub-tv');
+    b.innerHTML = document.getElementById('tv-body').innerHTML;
+  } else {
+    const b = document.getElementById('pub-bracket');
+    b.innerHTML = document.getElementById('bracket-container').innerHTML;
+  }
 }
 
 // ===================== HELPERS =====================
-let currentView = 'auth';
-let autoRefreshInterval = null;
-
 function showView(v) {
   currentView = v;
-  ['auth','inscripcion','torneos','manage','bracket','display'].forEach(x=>{
-    const el=document.getElementById(`view-${x}`);
-    if(el)el.classList.toggle('active',x===v);
-    const nt=document.getElementById(`ntab-${x}`);
-    if(nt)nt.classList.toggle('active',x===v);
+  ['auth','torneos','manage','bracket','display','public'].forEach(x => {
+    const el = document.getElementById('view-' + x);
+    if (el) el.classList.toggle('active', x === v);
+    const nt = document.getElementById('ntab-' + x);
+    if (nt) nt.classList.toggle('active', x === v);
   });
-  if(v==='manage')  { loadPartidos(); }
-  if(v==='bracket') { loadPartidos(); }
-  if(v==='display') { loadPartidos(); startAutoRefresh(); }
-  if(v==='torneos') { loadTorneos(); }
-  if(v!=='display') { stopAutoRefresh(); }
+  if (v === 'manage')  loadPartidos();
+  if (v === 'bracket') loadPartidos();
+  if (v === 'display') { loadPartidos(); startAutoRefresh(); }
+  if (v === 'torneos') loadTorneos();
+  if (v !== 'display' && v !== 'public') stopAutoRefresh();
 }
 
 function startAutoRefresh() {
   stopAutoRefresh();
   autoRefreshInterval = setInterval(async () => {
-    if(currentView === 'display' && activeTorneo) await loadPartidos();
+    if ((currentView === 'display' || currentView === 'public') && activeTorneo) await loadPartidos();
   }, 10000);
 }
 
 function stopAutoRefresh() {
-  if(autoRefreshInterval) { clearInterval(autoRefreshInterval); autoRefreshInterval = null; }
+  if (autoRefreshInterval) { clearInterval(autoRefreshInterval); autoRefreshInterval = null; }
 }
 
 async function manualRefresh() {
   const btn = document.getElementById('btn-refresh');
-  if(btn) { btn.textContent = '↻ Actualizando...'; btn.disabled = true; }
+  if (btn) { btn.textContent = '↻ Actualizando...'; btn.disabled = true; }
   await loadPartidos();
-  if(btn) { btn.textContent = '↻ Actualizar'; btn.disabled = false; }
+  if (btn) { btn.textContent = '↻ Actualizar'; btn.disabled = false; }
 }
 
 function injectRefreshBtn(viewId) {
-  if(document.getElementById('btn-refresh')) return;
+  if (document.getElementById('btn-refresh')) return;
   const titleEl = document.querySelector('#view-' + viewId + ' .section-title');
-  if(!titleEl) return;
+  if (!titleEl) return;
   const btn = document.createElement('button');
-  btn.id = 'btn-refresh';
-  btn.className = 'btn sm';
+  btn.id = 'btn-refresh'; btn.className = 'btn sm';
   btn.style.cssText = 'margin-left:12px;vertical-align:middle;font-size:12px;';
-  btn.innerHTML = '↻ Actualizar';
-  btn.onclick = manualRefresh;
+  btn.innerHTML = '↻ Actualizar'; btn.onclick = manualRefresh;
   titleEl.appendChild(btn);
 }
 
-function setMsg(id, msg, type='info') {
-  const el=document.getElementById(id);if(!el)return;
-  el.innerHTML=msg?`<div class="alert ${type}">${msg}</div>`:'';
-}
-
-// loadPartidos — carga partidos desde Supabase y refresca todas las vistas
-async function loadPartidos() {
-  if(!activeTorneo) return;
-  const {data, error} = await sb.from('fifa_partidos').select('*').eq('torneo_id', activeTorneo.id).order('ronda').order('posicion');
-  if(error) { console.error('loadPartidos error:', error.message); return; }
-  if(!data||!data.length) return;
-  const maxRonda = Math.max(...data.map(m=>m.ronda));
-  rounds = [];
-  for(let r=0;r<=maxRonda;r++) rounds.push(data.filter(m=>m.ronda===r));
-  renderManage(); renderBracket(); renderDisplay(); renderStats();
-  if(currentView==='manage')  setTimeout(()=>injectRefreshBtn('manage'), 60);
-  if(currentView==='bracket') setTimeout(()=>injectRefreshBtn('bracket'), 60);
-  const ind = document.getElementById('tv-last-refresh');
-  if(ind) ind.textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+function setMsg(id, msg, type = 'info') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = msg ? '<div class="alert ' + type + '">' + msg + '</div>' : '';
 }
 
 // Clock
-setInterval(()=>{const e=document.getElementById('tv-clock');if(e)e.textContent=new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'});},1000);
+setInterval(() => {
+  const e = document.getElementById('tv-clock');
+  if (e) e.textContent = new Date().toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
+}, 1000);
 
-// URL param: ?torneo=ID
-const urlParams=new URLSearchParams(location.search);
-const torneoParam=urlParams.get('torneo');
-if(torneoParam) {
-  sb.auth.getSession().then(({data:{session}})=>{
-    if(session){currentUser=session.user;loadInscripcionPublica(torneoParam).then(()=>showView('inscripcion'));}
+// URL param ?torneo=ID — vista pública sin login
+const torneoParam = new URLSearchParams(location.search).get('torneo');
+if (torneoParam) {
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (!session) loadTorneoPublico(torneoParam);
+    // Si hay sesión, el onAuthStateChange lo maneja
   });
 }
 </script>
