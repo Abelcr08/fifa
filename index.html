@@ -670,8 +670,54 @@ async function confirmWinner(matchId) {
   m.estado = 'completado';
   await sb.from('fifa_partidos').update({ ganador: m.ganador, score1: m.score1, score2: m.score2, estado: 'completado' }).eq('id', matchId);
   propagate();
+  checkBestLoser();
   await updateNextRoundInDB(m.ronda);
   renderManage(); renderBracket(); renderDisplay(); renderStats();
+}
+
+// Mejor perdedor: cuando R0 termina completamente y hay slots TBD en R1,
+// se elige el perdedor con más goles a favor, luego menos en contra, luego rifa.
+function checkBestLoser() {
+  if (!rounds || rounds.length < 2) return;
+  const r0 = rounds[0];
+  const r1 = rounds[1];
+  if (!r0 || !r1) return;
+
+  // Solo aplica si hay slots TBD en R1 que no son bye players
+  const tbdSlotsR1 = [];
+  r1.forEach((m, mi) => {
+    if (m.estado === 'completado') return;
+    if (m.p1 === 'TBD') tbdSlotsR1.push({ match: m, slot: 'p1' });
+    if (m.p2 === 'TBD') tbdSlotsR1.push({ match: m, slot: 'p2' });
+  });
+  if (!tbdSlotsR1.length) return;
+
+  // Ver si todos los partidos de R0 están completados
+  const r0Done = r0.every(m => m.estado === 'completado');
+  if (!r0Done) return;
+
+  // Recolectar perdedores de R0 con sus stats
+  const losers = r0.map(m => {
+    const loser = m.ganador === m.p1 ? m.p2 : m.p1;
+    const golesAFavor  = m.ganador === m.p1 ? (m.score2 ?? 0) : (m.score1 ?? 0);
+    const golesEnContra = m.ganador === m.p1 ? (m.score1 ?? 0) : (m.score2 ?? 0);
+    return { nombre: loser, golesAFavor, golesEnContra };
+  });
+
+  // Ordenar: más goles a favor → menos en contra → aleatorio
+  losers.sort((a, b) => {
+    if (b.golesAFavor !== a.golesAFavor) return b.golesAFavor - a.golesAFavor;
+    if (a.golesEnContra !== b.golesEnContra) return a.golesEnContra - b.golesEnContra;
+    return Math.random() - 0.5; // rifa
+  });
+
+  // Asignar mejores perdedores a los slots TBD de R1
+  tbdSlotsR1.forEach((slot, i) => {
+    if (losers[i]) {
+      slot.match[slot.slot] = losers[i].nombre;
+      slot.match._bestLoser = true; // marcar para mostrar en UI
+    }
+  });
 }
 
 async function resetMatch(matchId) {
@@ -726,6 +772,38 @@ function renderManage() {
   if (!b) return;
   if (!rounds.length) { b.innerHTML = '<div class="loader"><div class="spinner"></div>Cargando partidos...</div>'; loadPartidos(); return; }
   let html = '';
+
+  // Panel mejor perdedor — solo cuando R0 terminó y hay slots TBD en R1
+  if (rounds.length >= 2) {
+    const r0 = rounds[0], r1 = rounds[1];
+    const r0Done = r0 && r0.every(m => m.estado === 'completado');
+    const hasTBD = r1 && r1.some(m => m.p1 === 'TBD' || m.p2 === 'TBD');
+    if (r0Done && hasTBD) {
+      const losers = r0.map(m => {
+        const loser = m.ganador === m.p1 ? m.p2 : m.p1;
+        const gf = m.ganador === m.p1 ? (m.score2 ?? 0) : (m.score1 ?? 0);
+        const gc = m.ganador === m.p1 ? (m.score1 ?? 0) : (m.score2 ?? 0);
+        return { nombre: loser, gf, gc };
+      }).sort((a,b) => b.gf !== a.gf ? b.gf - a.gf : a.gc - b.gc);
+      // Count how many best losers are needed
+      const tbdCount = r1.reduce((acc,m) => acc + (m.p1==='TBD'?1:0) + (m.p2==='TBD'?1:0), 0);
+      html += '<div style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.3);border-radius:10px;padding:14px 16px;margin-bottom:16px">';
+      html += '<div style="font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:1px;color:var(--gold);margin-bottom:10px">★ Mejor Perdedor — clasificando a siguiente ronda</div>';
+      html += '<div style="display:flex;flex-direction:column;gap:6px">';
+      losers.forEach((l, i) => {
+        const advancing = i < tbdCount;
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--bg3);border-radius:7px;border:1px solid ' + (advancing ? 'rgba(240,165,0,.4)' : 'var(--border)') + '">';
+        html += '<span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:' + (advancing ? 'var(--gold)' : 'var(--text2)') + ';min-width:20px">' + (i+1) + '</span>';
+        html += '<span style="flex:1;font-size:14px;font-weight:' + (advancing ? '600' : '400') + '">' + l.nombre + '</span>';
+        html += '<span style="font-size:12px;color:var(--text2)">GF: <strong style="color:' + (advancing ? 'var(--gold)' : 'var(--text)') + '">' + l.gf + '</strong></span>';
+        html += '<span style="font-size:12px;color:var(--text2);margin-left:8px">GC: <strong>' + l.gc + '</strong></span>';
+        if (advancing) html += '<span style="font-size:10px;background:rgba(240,165,0,.2);color:var(--gold);padding:2px 7px;border-radius:4px;font-weight:600">AVANZA</span>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+    }
+  }
+
   rounds.forEach((round, ri) => {
     const visible = round.filter(m => m.p1 !== 'BYE' && m.p2 !== 'BYE');
     if (!visible.length) return;
@@ -787,7 +865,8 @@ function renderBracket() {
       html += '<div class="b-match ' + (m.estado === 'jugando' ? 'playing' : '') + '">';
       [['p1','score1'],['p2','score2']].forEach(([pk, sk]) => {
         const p = m[pk], sc = m[sk], isW = m.ganador === p && p !== 'TBD', isL = m.ganador && m.ganador !== p && p !== 'TBD', isTBD = p === 'TBD';
-        html += '<div class="b-player ' + (isW ? 'winner' : '') + ' ' + (isL ? 'loser' : '') + ' ' + (isTBD ? 'tbd' : '') + '"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + p + '</span>';
+        const isBestLoser = !isTBD && !isW && ri > 0 && rounds[0] && rounds[0].every(x=>x.estado==='completado') && rounds[0].some(x=>x.ganador && x.ganador!==p && (x.p1===p||x.p2===p));
+        html += '<div class="b-player ' + (isW ? 'winner' : '') + ' ' + (isL ? 'loser' : '') + ' ' + (isTBD ? 'tbd' : '') + '"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + p + (isBestLoser ? ' <span style="font-size:9px;background:rgba(240,165,0,.2);color:var(--gold);padding:1px 5px;border-radius:3px;margin-left:4px">★ ML</span>' : '') + '</span>';
         if (sc !== null && sc !== undefined) html += '<span class="b-score">' + sc + '</span>';
         if (m.estado === 'jugando' && m.consola) html += '<span class="b-console-tag">PS5#' + m.consola + '</span>';
         html += '</div>';
