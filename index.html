@@ -572,8 +572,10 @@ function buildRounds(players, consolasCount) {
   const ts = Date.now();
   rounds = [];
 
-  const byePlayers = players.slice(0, byeCount);   // avanzan directo
-  const r0Players  = players.slice(byeCount);       // juegan R0
+  // Mezclar aleatoriamente antes de asignar byes y partidos
+  const shuffled = [...players].sort(() => Math.random() - 0.5);
+  const byePlayers = shuffled.slice(0, byeCount);   // avanzan directo
+  const r0Players  = shuffled.slice(byeCount);       // juegan R0
 
   // R0: partidos entre los jugadores sin bye
   const r0 = [];
